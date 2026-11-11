@@ -82,7 +82,7 @@ const navigation = [
 const descriptions: Record<Page, string> = {
   overview: "Real-time check-in and event progress",
   teams: "Your teams, ready for the big day",
-  passes: "One team pass. Every eligible checkpoint.",
+  passes: "One team pass for every checkpoint.",
   history: "Every confirmation, with a clear trail",
   volunteers: "The people keeping your event moving",
   operations: "Checkpoint schedules and operational safeguards",
@@ -270,9 +270,7 @@ export function Admin({ gateway, user, snapshot, refresh, onLogout }: Props) {
       const schedule = snapshot.schedules.find(
         (s) => s.day === day && s.mode === mode,
       );
-      const teams = teamScope.filter(
-        (t) => schedule?.enabled && schedule.categories.includes(t.category),
-      );
+      const teams = schedule?.enabled ? teamScope : [];
       const ids = new Set(teams.map((t) => t.id));
       return [
         mode,
@@ -793,7 +791,7 @@ export function Admin({ gateway, user, snapshot, refresh, onLogout }: Props) {
                 <p>
                   {page === "teams"
                     ? "Search, verify and maintain your event roster."
-                    : "The same pass works at every eligible checkpoint."}
+                    : "The same pass works at every open checkpoint."}
                 </p>
               </div>
               <div className="button-row">
@@ -1078,9 +1076,7 @@ export function Admin({ gateway, user, snapshot, refresh, onLogout }: Props) {
                         <small>
                           {formatTime(s.opens)} – {formatTime(s.closes)} IST
                         </small>
-                        <small>
-                          Categories {s.categories.join(" · ") || "none"}
-                        </small>
+                        <small>All team categories</small>
                       </div>
                       <span
                         className={s.enabled ? "status-enabled" : "status-void"}
@@ -1134,7 +1130,7 @@ export function Admin({ gateway, user, snapshot, refresh, onLogout }: Props) {
                   {
                     icon: CalendarDays,
                     name: "Checkpoint scheduling",
-                    text: "Windows and category rules control eligibility.",
+                    text: "Checkpoint windows control when teams can check in.",
                   },
                   {
                     icon: Download,
@@ -1457,7 +1453,7 @@ export function Admin({ gateway, user, snapshot, refresh, onLogout }: Props) {
                   Category {dialog.team.category} · {dialog.team.members.length}{" "}
                   members
                 </span>
-                <p>Present this pass at each eligible checkpoint.</p>
+                <p>Present this pass at each open checkpoint.</p>
               </div>
               <div className="button-row">
                 <a
@@ -1565,7 +1561,6 @@ export function Admin({ gateway, user, snapshot, refresh, onLogout }: Props) {
                         String(f.get("closes")) + "+05:30",
                       ).toISOString(),
                       enabled: f.get("enabled") === "on",
-                      categories: f.getAll("categories") as Category[],
                     },
                     String(f.get("reason")),
                   );
@@ -1611,22 +1606,7 @@ export function Admin({ gateway, user, snapshot, refresh, onLogout }: Props) {
                 />
                 Enable checkpoint
               </label>
-              <fieldset>
-                <legend>Eligible categories</legend>
-                {Object.entries(categories).map(([c, name]) => (
-                  <label key={c} className="checkbox-label">
-                    <input
-                      type="checkbox"
-                      name="categories"
-                      value={c}
-                      defaultChecked={dialog.schedule.categories.includes(
-                        c as Category,
-                      )}
-                    />
-                    {c} · {name}
-                  </label>
-                ))}
-              </fieldset>
+              <p>All team categories can check in during this window.</p>
               <label>
                 Reason
                 <input name="reason" required minLength={5} />

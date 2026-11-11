@@ -162,7 +162,6 @@ function makeSeed(now: number): State {
       opens: new Date(now - 86400000).toISOString(),
       closes: new Date(now + 7 * 86400000).toISOString(),
       enabled: true,
-      categories: ["A", "B", "C"] as Category[],
       revision: 1,
     })),
   );
@@ -322,11 +321,6 @@ function requireEligibility(
       "This checkpoint is closed. Ask an administrator to verify the schedule.",
     );
   }
-  if (!schedule.categories.includes(team.category))
-    throw new AppError(
-      "INELIGIBLE",
-      "This team category is not eligible for the selected service.",
-    );
   return schedule;
 }
 
@@ -892,17 +886,7 @@ export function createDemoGateway(options: DemoOptions = {}): Gateway {
             "INVALID_SCHEDULE",
             "The closing time must be after the opening time.",
           );
-        if (
-          input.categories.some(
-            (category) => !["A", "B", "C"].includes(category),
-          )
-        )
-          throw new AppError(
-            "INVALID_CATEGORY",
-            "Choose valid categories A, B and C.",
-          );
         Object.assign(existing, input, {
-          categories: [...new Set(input.categories)],
           revision: existing.revision + 1,
         });
         addAudit(

@@ -69,7 +69,7 @@ before(async () => {
   );
   await db.query(
     `insert into ops.schedules(event_id,day,mode,opens,closes,enabled,categories)
-    select $1,day,mode,now()-interval '1 day',now()+interval '1 day',true,array['A','B','C'] from generate_series(1,2) day cross join unnest(array['entry','lunch','dinner']) mode`,
+    select $1,day,mode,now()-interval '1 day',now()+interval '1 day',true,array['B'] from generate_series(1,2) day cross join unnest(array['entry','lunch','dinner']) mode`,
     [event],
   );
   await actor(admin);

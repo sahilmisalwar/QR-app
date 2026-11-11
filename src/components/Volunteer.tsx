@@ -96,12 +96,9 @@ export function Volunteer({
   const schedule = snapshot.schedules.find(
     (item) => item.day === user.day && item.mode === mode,
   );
-  const eligible = snapshot.teams.filter(
-    (team) =>
-      team.active &&
-      schedule?.enabled &&
-      schedule.categories.includes(team.category),
-  );
+  const eligible = schedule?.enabled
+    ? snapshot.teams.filter((team) => team.active)
+    : [];
   const history = snapshot.claims
     .filter((claim) => claim.day === user.day && claim.mode === mode)
     .sort((a, b) => b.at.localeCompare(a.at));
@@ -321,7 +318,6 @@ export function Volunteer({
         "PREVIEW_EXPIRED",
         "CONTEXT_CHANGED",
         "WINDOW_CLOSED",
-        "INELIGIBLE",
         "FULL_TEAM_REQUIRED",
         "REQUEST_CONFLICT",
         "FORBIDDEN",

@@ -29,13 +29,13 @@ insert into ops.staff (event_id, id, name, role, mode, day)
 values ('EVENT_UUID', 'AUTH_VOLUNTEER_UUID', 'Volunteer Name', 'volunteer', 'lunch', 1);
 ```
 
-6. Create exactly one schedule row for each configured day and checkpoint. Use the organizer-approved opening and closing instants with an explicit time offset. Supply eligible A/B/C categories. Keep unapproved services disabled. Example shape follows. The placeholders deliberately require actual event decisions.
+6. Create exactly one schedule row for each configured day and checkpoint. Use the organizer-approved opening and closing instants with an explicit time offset. All team categories can use every open checkpoint. Keep unapproved services disabled. Example shape follows. The placeholders deliberately require actual event decisions.
 
 ```sql
 insert into ops.schedules
-  (event_id, day, mode, opens, closes, enabled, categories)
+  (event_id, day, mode, opens, closes, enabled)
 values
-  ('EVENT_UUID', 1, 'lunch', 'APPROVED_OPEN_TIME', 'APPROVED_CLOSE_TIME', false, '{}');
+  ('EVENT_UUID', 1, 'lunch', 'APPROVED_OPEN_TIME', 'APPROVED_CLOSE_TIME', false);
 ```
 
 7. Copy `.env.example` to `.env.local`. Set `VITE_DATA_MODE=supabase`, the project URL, its publishable key and event UUID. Restart the dev server. The publishable key is intended for the browser. Service-role keys, database passwords and Vault secrets must stay server-side.

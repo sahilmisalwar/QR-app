@@ -10,7 +10,7 @@ begin
   insert into ops.events(id,name,active) values(e,'Disposable transaction verification',true);
   insert into ops.staff(event_id,id,name,role,mode) values(e,a,'Verification admin','admin','entry'),(e,v,'Verification volunteer','volunteer','lunch');
   insert into ops.schedules(event_id,day,mode,opens,closes,enabled,categories)
-    select e,1,m,now()-interval '1 hour',now()+interval '1 hour',true,array['A','B','C'] from unnest(array['entry','lunch','dinner']) m;
+    select e,1,m,now()-interval '1 hour',now()+interval '1 hour',true,array['B'] from unnest(array['entry','lunch','dinner']) m;
   perform set_config('test.event',e::text,true);
   perform set_config('test.admin',a::text,true);
   perform set_config('test.volunteer',v::text,true);
@@ -52,6 +52,7 @@ begin
    raise exception 'CHECK_FAILED: wrong station allowed';
  exception when raise_exception then if sqlerrm not like 'FORBIDDEN|%' then raise; end if; end;
  p:=api.call(e,'preview',jsonb_build_object('token',token,'day',1,'mode','lunch'));
+ if p->'team'->>'category' is distinct from 'A' then raise exception 'CHECK_FAILED: team category missing from preview'; end if;
  p2:=api.call(e,'preview',jsonb_build_object('token',token,'day',1,'mode','lunch'));
  begin
    perform api.call(e,'confirm',jsonb_build_object('previewId',p->>'id','requestId',request_id,'fullTeam',false));

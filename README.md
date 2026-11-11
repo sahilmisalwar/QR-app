@@ -17,7 +17,7 @@ Try **Unclaimed team** in a volunteer scanner to review members and explicitly c
 - Light admin dashboard with the reference masthead, teal navigation, progress rings, live totals and quick actions.
 - Blue Entry, amber Lunch and purple Dinner volunteer layouts, camera scanning and QR image decoding, member verification, human confirmation, success, duplicate and connection recovery.
 - Team search, editing, CSV validation and atomic imports, individual QR downloads and printable team passes.
-- Locked volunteer assignments, day and category schedules, immutable original claims with audited corrections, QR replacement and CSV reports.
+- Locked volunteer assignments, day and checkpoint schedules, immutable original claims with audited corrections, QR replacement and CSV reports.
 - Supabase adapter, private database schema, permissions, atomic confirmation, unique claim constraints, session checks, encrypted pass storage and SQL regression tests.
 
 ## Development
@@ -43,7 +43,7 @@ Email password recovery is deliberately unavailable until custom SMTP, redirect 
 
 ## Before production release
 
-Confirm actual dates, day 2 meals and category eligibility. Connect the existing registration source or import its approved CSV. Provision named staff accounts, complete Auth email configuration and publish a trusted HTTPS deployment for mobile cameras. Registration webhook integration, batch pass files, controlled manual incident reconciliation, export pagination and operational backup/restore automation remain subsequent release work. Apply request throttling and a preview-retention cleanup policy and run real concurrent-session load tests before event use. The current database serializes event operations with an event lock, which prioritizes correctness for the first build and must be measured at venue load.
+Confirm actual dates and day 2 meals. Team categories are displayed on scan results and available for reporting. Connect the existing registration source or import its approved CSV. Provision named staff accounts, complete Auth email configuration and publish a trusted HTTPS deployment for mobile cameras. Registration webhook integration, batch pass files, controlled manual incident reconciliation, export pagination and operational backup/restore automation remain subsequent release work. Apply request throttling and a preview-retention cleanup policy and run real concurrent-session load tests before event use. The current database serializes event operations with an event lock, which prioritizes correctness for the first build and must be measured at venue load.
 
 CSV reports contain operational data. Full database recovery needs a separately managed backup, Vault recovery and tested restore procedure. Screens use the truthful status available to this build.
 

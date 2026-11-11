@@ -38,7 +38,6 @@ export interface Schedule {
   opens: string;
   closes: string;
   enabled: boolean;
-  categories: Category[];
   revision: number;
 }
 export interface Audit {
