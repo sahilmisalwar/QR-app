@@ -48,11 +48,25 @@ const confirm = page.getByRole("button", {
   exact: true,
 });
 if (await confirm.isEnabled())
-  throw Error("Meal confirmation must require full-team attestation");
+  throw Error("Confirmation must require a member selection");
 await page.screenshot({ path: "test-results/verify.png", fullPage: true });
-await page.getByRole("checkbox").check();
+const members = await page.getByRole("checkbox").all();
+if (members.length !== 4) throw Error("Expected a four-member rehearsal team");
+for (const member of members.slice(0, 2)) await member.check();
 await confirm.click();
 await page.getByRole("heading", { name: "Check-in Successful!" }).waitFor();
+await page.getByText("2 remaining can use the same QR.", { exact: false }).waitFor();
+await page.getByRole("button", { name: "Scan Next Team" }).click();
+await page.getByRole("button", { name: "Unclaimed team" }).click();
+await page.getByRole("heading", { name: "Verify team members" }).waitFor();
+const checked = page.getByRole("checkbox", { checked: true });
+if (await checked.count() !== 2) throw Error("Previously checked members were not shown");
+for (const member of await checked.all())
+  if (await member.isEnabled()) throw Error("Previously checked member is selectable");
+for (const member of await page.getByRole("checkbox").all())
+  if (await member.isEnabled()) await member.check();
+await confirm.click();
+await page.getByText("Everyone has checked in for this checkpoint.", { exact: false }).waitFor();
 await page.getByRole("button", { name: "Scan Next Team" }).click();
 await page.getByRole("button", { name: "Unclaimed team" }).click();
 await page.getByRole("heading", { name: "Already Checked In" }).waitFor();

@@ -1,3 +1,4 @@
+import { confirmedMembers, memberCount } from "../lib/attendance";
 import { useEffect, useRef, useState } from "react";
 import {
   Home,
@@ -163,7 +164,12 @@ function HistoryTable({
               <td>
                 <span className="team-code">{c.teamCode}</span>
               </td>
-              <td className="team-name">{c.teamName}</td>
+              <td className="team-name">
+                {c.teamName}
+                {c.memberNames?.length ? (
+                  <small>{c.memberNames.join(", ")}</small>
+                ) : null}
+              </td>
               <td>
                 <span className={`category-badge cat-${c.category}`}>
                   {c.category}
@@ -271,17 +277,14 @@ export function Admin({ gateway, user, snapshot, refresh, onLogout }: Props) {
         (s) => s.day === day && s.mode === mode,
       );
       const teams = schedule?.enabled ? teamScope : [];
-      const ids = new Set(teams.map((t) => t.id));
       return [
         mode,
         {
           total: teams.length,
-          count: snapshot.claims.filter(
-            (c) =>
-              c.day === day &&
-              c.mode === mode &&
-              c.status === "confirmed" &&
-              ids.has(c.teamId),
+          count: teams.filter(
+            (team) =>
+              confirmedMembers(snapshot.claims, team, day, mode).size ===
+              memberCount(team),
           ).length,
         },
       ];
@@ -358,6 +361,8 @@ export function Admin({ gateway, user, snapshot, refresh, onLogout }: Props) {
             "Category",
             "Confirmed at UTC",
             "Operator",
+            "Members checked in",
+            "Member names",
             "Status",
             "Reason",
           ],
@@ -376,6 +381,8 @@ export function Admin({ gateway, user, snapshot, refresh, onLogout }: Props) {
               c.category,
               c.at,
               c.actor,
+              c.quantity ?? "",
+              c.memberNames?.join(" | ") ?? "",
               c.status,
               c.reason,
             ]),
@@ -875,25 +882,32 @@ export function Admin({ gateway, user, snapshot, refresh, onLogout }: Props) {
                       <td>{t.members.length}</td>
                       <td>
                         <div className="team-status">
-                          {modes.map((m) => (
-                            <span
-                              key={m}
-                              title={`${labels[m]} ${snapshot.claims.some((c) => c.teamId === t.id && c.day === day && c.mode === m && c.status === "confirmed") ? "confirmed" : "pending"}`}
-                              className={
-                                snapshot.claims.some(
-                                  (c) =>
-                                    c.teamId === t.id &&
-                                    c.day === day &&
-                                    c.mode === m &&
-                                    c.status === "confirmed",
-                                )
-                                  ? m
-                                  : "pending"
-                              }
-                            >
-                              <ModeIcon mode={m} size={14} />
-                            </span>
-                          ))}
+                          {modes.map((m) => {
+                            const checked = confirmedMembers(
+                              snapshot.claims,
+                              t,
+                              day,
+                              m,
+                            ).size;
+                            const total = memberCount(t);
+                            return (
+                              <span
+                                key={m}
+                                title={
+                                  labels[m] +
+                                  ": " +
+                                  checked +
+                                  " of " +
+                                  total +
+                                  " checked in"
+                                }
+                                className={checked === total ? m : "pending"}
+                              >
+                                <ModeIcon mode={m} size={14} />
+                                {checked}/{total}
+                              </span>
+                            );
+                          })}
                         </div>
                       </td>
                       <td>
@@ -1130,7 +1144,7 @@ export function Admin({ gateway, user, snapshot, refresh, onLogout }: Props) {
                   {
                     icon: ShieldCheck,
                     name: "Duplicate protection",
-                    text: "One active claim per team, day and service.",
+                    text: "Each member can check in once per day and checkpoint.",
                   },
                   {
                     icon: History,
@@ -1729,7 +1743,7 @@ export function Admin({ gateway, user, snapshot, refresh, onLogout }: Props) {
               </p>
               <div className="security-pill">
                 <CircleHelp size={18} />
-                Meals require the whole team to be present.
+                Select the members present on each visit.
               </div>
               <button className="button" onClick={onLogout}>
                 <LogOut size={16} />

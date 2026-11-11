@@ -72,8 +72,8 @@ export function createSupabaseGateway(
     snapshot: () => call<Snapshot>("snapshot"),
     preview: (token, day, mode) =>
       call<Preview>("preview", { token, day, mode }),
-    confirm: (previewId, requestId, fullTeam) =>
-      call<Receipt>("confirm", { previewId, requestId, fullTeam }),
+    confirm: (previewId, requestId, memberIndices) =>
+      call<Receipt>("confirm", { previewId, requestId, memberIndices }),
     commandStatus: (requestId) =>
       call<Receipt | null>("receipt", { requestId }),
     async saveTeam(team) {

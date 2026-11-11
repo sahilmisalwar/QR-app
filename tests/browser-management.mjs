@@ -46,7 +46,7 @@ await page
 await page
   .getByRole("heading", { name: "Browser Test Team", exact: true })
   .waitFor();
-await page.getByRole("checkbox").check();
+for (const member of await page.getByRole("checkbox").all()) await member.check();
 await page.getByRole("button", { name: "Confirm Lunch Check-in" }).click();
 await page.getByRole("heading", { name: "Check-in Successful!" }).waitFor();
 await page.getByRole("button", { name: "Back to dashboard" }).click();

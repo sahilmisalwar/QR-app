@@ -1,3 +1,4 @@
+import { confirmedMembers } from "./attendance";
 import { randomId } from "./id";
 import { AppError, modes } from "./types";
 import type {
@@ -347,7 +348,16 @@ function effectiveReceipt(state: State, receipt: Receipt): Receipt {
       "RECEIPT_MISSING",
       "The recorded result could not be found. Contact an administrator.",
     );
-  return { code: claim.status === "voided" ? "VOIDED" : receipt.code, claim };
+  const team = state.teams.find((item) => item.id === claim.teamId);
+  const remainingCount = team
+    ? team.members.length -
+      confirmedMembers(state.claims, team, claim.day, claim.mode).size
+    : receipt.remainingCount;
+  return {
+    code: claim.status === "voided" ? "VOIDED" : receipt.code,
+    claim,
+    remainingCount,
+  };
 }
 
 function snapshotFor(state: State, actor: Staff, now: number): Snapshot {
@@ -355,7 +365,11 @@ function snapshotFor(state: State, actor: Staff, now: number): Snapshot {
   return {
     teams: admin
       ? state.teams
-      : state.teams.map((team) => ({ ...team, members: [] })),
+      : state.teams.map((team) => ({
+          ...team,
+          memberCount: team.members.length,
+          members: [],
+        })),
     claims: state.claims
       .filter(
         (claim) =>
@@ -424,6 +438,17 @@ function saveTeamRecord(
     members: input.members.map((name) => name.trim()),
     active: input.active,
   };
+  if (
+    existing &&
+    JSON.stringify(existing.members) !== JSON.stringify(team.members) &&
+    state.claims.some(
+      (claim) => claim.teamId === existing.id && claim.status === "confirmed",
+    )
+  )
+    throw new AppError(
+      "ROSTER_LOCKED",
+      "Reverse this team's confirmed check-ins before changing its member list.",
+    );
   if (existing) Object.assign(existing, team);
   else {
     state.teams.push(team);
@@ -594,14 +619,19 @@ export function createDemoGateway(options: DemoOptions = {}): Gateway {
             item.mode === mode &&
             item.status === "confirmed",
         );
+        const checkedMemberIndices = [
+          ...confirmedMembers(state.claims, team, day, mode),
+        ];
+        const complete = checkedMemberIndices.length === team.members.length;
         const preview: Preview = {
           id: randomId(),
           team,
           mode,
           day,
           expires: new Date(now() + 60000).toISOString(),
-          decision: previous ? "ALREADY_CONFIRMED" : "ELIGIBLE",
-          previous,
+          decision: complete ? "ALREADY_CONFIRMED" : "ELIGIBLE",
+          previous: complete ? previous : undefined,
+          checkedMemberIndices,
         };
         for (const [id, stored] of Object.entries(state.previews)) {
           if (Date.parse(stored.expires) < now() - 86400000)
@@ -621,7 +651,11 @@ export function createDemoGateway(options: DemoOptions = {}): Gateway {
         return preview;
       });
     },
-    async confirm(previewId: string, requestId: string, fullTeam: boolean) {
+    async confirm(
+      previewId: string,
+      requestId: string,
+      memberIndices: number[],
+    ) {
       return transaction((state) => {
         const session = getSession();
         const actor = requireActor(state, session);
@@ -631,7 +665,7 @@ export function createDemoGateway(options: DemoOptions = {}): Gateway {
             "The request identifier is invalid. Scan again.",
           );
         const key = `${actor.id}/${requestId}`;
-        const fingerprint = JSON.stringify([previewId, fullTeam]);
+        const fingerprint = JSON.stringify([previewId, memberIndices]);
         const prior = state.receipts[key];
         if (prior) {
           if (prior.fingerprint !== fingerprint)
@@ -664,11 +698,6 @@ export function createDemoGateway(options: DemoOptions = {}): Gateway {
           throw new AppError(
             "CONTEXT_CHANGED",
             "Your assignment changed. Scan the team again.",
-          );
-        if (preview.mode !== "entry" && fullTeam !== true)
-          throw new AppError(
-            "FULL_TEAM_REQUIRED",
-            "Verify that every registered member is present before confirming a meal.",
           );
         if (Date.parse(preview.expires) <= now())
           throw new AppError(
@@ -704,9 +733,37 @@ export function createDemoGateway(options: DemoOptions = {}): Gateway {
             item.mode === preview.mode &&
             item.status === "confirmed",
         );
+        if (!Array.isArray(memberIndices) || !memberIndices.length)
+          throw new AppError("MEMBERS_REQUIRED", "Select the members present.");
+        if (
+          new Set(memberIndices).size !== memberIndices.length ||
+          memberIndices.some(
+            (i) => !Number.isInteger(i) || i < 0 || i >= team.members.length,
+          )
+        )
+          throw new AppError(
+            "INVALID_MEMBERS",
+            "Select valid team members once.",
+          );
+        const checked = confirmedMembers(
+          state.claims,
+          team,
+          preview.day,
+          preview.mode,
+        );
+        const complete = checked.size === team.members.length;
+        if (!complete && memberIndices.some((i) => checked.has(i)))
+          throw new AppError(
+            "MEMBERS_ALREADY_CHECKED_IN",
+            "Some members are already checked in. Scan again to see who is left.",
+          );
         let receipt: Receipt;
-        if (existing) {
-          receipt = { code: "ALREADY_CONFIRMED", claim: existing };
+        if (existing && complete) {
+          receipt = {
+            code: "ALREADY_CONFIRMED",
+            claim: existing,
+            remainingCount: 0,
+          };
           addAudit(
             state,
             actor,
@@ -731,14 +788,22 @@ export function createDemoGateway(options: DemoOptions = {}): Gateway {
             at: new Date(now()).toISOString(),
             actor: actor.name,
             status: "confirmed",
+            memberIndices: [...memberIndices],
+            memberNames: memberIndices.map((i) => team.members[i]),
+            quantity: memberIndices.length,
           };
           state.claims.push(claim);
-          receipt = { code: "CONFIRMED", claim };
+          receipt = {
+            code: "CONFIRMED",
+            claim,
+            remainingCount:
+              team.members.length - checked.size - memberIndices.length,
+          };
           addAudit(
             state,
             actor,
             "Check-in confirmed",
-            `${team.code} · Day ${preview.day} · ${preview.mode}${preview.mode === "entry" ? "" : " · full team present"}`,
+            `${team.code} · Day ${preview.day} · ${preview.mode} · ${memberIndices.length} members`,
             now(),
           );
         }

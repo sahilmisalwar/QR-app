@@ -16,6 +16,7 @@ export interface Team {
   college: string;
   category: Category;
   members: string[];
+  memberCount?: number;
   active: boolean;
 }
 export interface Claim {
@@ -30,6 +31,9 @@ export interface Claim {
   actor: string;
   status: "confirmed" | "voided";
   reason?: string;
+  memberIndices?: number[] | null;
+  memberNames?: string[] | null;
+  quantity?: number;
 }
 export interface Schedule {
   id: string;
@@ -63,10 +67,12 @@ export interface Preview {
   expires: string;
   decision: "ELIGIBLE" | "ALREADY_CONFIRMED";
   previous?: Claim;
+  checkedMemberIndices?: number[];
 }
 export interface Receipt {
   code: "CONFIRMED" | "ALREADY_CONFIRMED" | "VOIDED";
   claim: Claim;
+  remainingCount?: number;
 }
 export interface Gateway {
   kind: "demo" | "supabase";
@@ -80,7 +86,7 @@ export interface Gateway {
   confirm(
     previewId: string,
     requestId: string,
-    fullTeam: boolean,
+    memberIndices: number[],
   ): Promise<Receipt>;
   commandStatus(requestId: string): Promise<Receipt | null>;
   saveTeam(team: Omit<Team, "id"> & { id?: string }): Promise<void>;

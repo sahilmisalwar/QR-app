@@ -95,8 +95,8 @@ test("concurrent station confirmations yield one claim and repeat requests retur
   const requestTwo = crypto.randomUUID();
   const before = await activeCount(admin);
   const results = await Promise.all([
-    stationOne.confirm(one.id, requestOne, true),
-    stationTwo.confirm(two.id, requestTwo, true),
+    stationOne.confirm(one.id, requestOne, [0, 1, 2, 3]),
+    stationTwo.confirm(two.id, requestTwo, [0, 1, 2, 3]),
   ]);
   assert.deepEqual(results.map((result) => result.code).sort(), [
     "ALREADY_CONFIRMED",
@@ -105,25 +105,24 @@ test("concurrent station confirmations yield one claim and repeat requests retur
   assert.equal(results[0].claim.id, results[1].claim.id);
   assert.equal(await activeCount(admin), before + 1);
   assert.deepEqual(
-    await stationOne.confirm(one.id, requestOne, true),
+    await stationOne.confirm(one.id, requestOne, [0, 1, 2, 3]),
     results[0],
   );
   assert.deepEqual(await stationOne.commandStatus(requestOne), results[0]);
   assert.equal(await activeCount(admin), before + 1);
-  await assert.rejects(stationOne.confirm(two.id, requestOne, true), {
+  await assert.rejects(stationOne.confirm(two.id, requestOne, [0, 1, 2, 3]), {
     code: "REQUEST_REUSED",
   });
 });
 
-test("meal attestation, session binding and volunteer scope are enforced", async () => {
+test("member selection, session binding and volunteer scope are enforced", async () => {
   const { admin, gateway } = await fixture();
   const volunteer = gateway();
   await volunteer.demoLogin("volunteer", "lunch");
   const preview = await volunteer.preview("RIH-DEMO-C-080", 1, "lunch");
-  await assert.rejects(
-    volunteer.confirm(preview.id, crypto.randomUUID(), false),
-    { code: "FULL_TEAM_REQUIRED" },
-  );
+  await assert.rejects(volunteer.confirm(preview.id, crypto.randomUUID(), []), {
+    code: "MEMBERS_REQUIRED",
+  });
   await assert.rejects(volunteer.preview("RIH-DEMO-C-080", 1, "dinner"), {
     code: "FORBIDDEN",
   });
@@ -141,7 +140,7 @@ test("meal attestation, session binding and volunteer scope are enforced", async
   await volunteer.logout();
   await volunteer.demoLogin("volunteer", "lunch");
   await assert.rejects(
-    volunteer.confirm(preview.id, crypto.randomUUID(), true),
+    volunteer.confirm(preview.id, crypto.randomUUID(), [0, 1, 2, 3]),
     { code: "PREVIEW_INVALID" },
   );
   assert.equal(await activeCount(admin), 803);
@@ -157,11 +156,14 @@ test("QR rotation invalidates old previews and preserves previous check-ins", as
   await assert.rejects(admin.preview("RIH-DEMO-C-080", 1, "lunch"), {
     code: "QR_REVOKED",
   });
-  await assert.rejects(admin.confirm(preview.id, crypto.randomUUID(), true), {
-    code: "QR_REVOKED",
-  });
+  await assert.rejects(
+    admin.confirm(preview.id, crypto.randomUUID(), [0, 1, 2, 3]),
+    {
+      code: "QR_REVOKED",
+    },
+  );
   const fresh = await admin.preview(replacement, 1, "lunch");
-  await admin.confirm(fresh.id, crypto.randomUUID(), true);
+  await admin.confirm(fresh.id, crypto.randomUUID(), [0, 1, 2, 3]);
   const secondReplacement = await admin.rotatePass(
     preview.team.id,
     "Replacement pass was exposed",
@@ -176,19 +178,23 @@ test("voids retain history and an idempotent replay reports the current voided s
   const { admin } = await fixture();
   const preview = await admin.preview("RIH-DEMO-C-080", 1, "entry");
   const request = crypto.randomUUID();
-  const receipt = await admin.confirm(preview.id, request, false);
+  const receipt = await admin.confirm(preview.id, request, [0, 1, 2, 3]);
   await admin.voidClaim(receipt.claim.id, "Mistaken team selection");
   assert.equal(
-    (await admin.confirm(preview.id, request, false)).code,
+    (await admin.confirm(preview.id, request, [0, 1, 2, 3])).code,
     "VOIDED",
   );
   assert.equal((await admin.commandStatus(request))?.code, "VOIDED");
-  await assert.rejects(admin.confirm(preview.id, crypto.randomUUID(), false), {
-    code: "PREVIEW_CONSUMED",
-  });
+  await assert.rejects(
+    admin.confirm(preview.id, crypto.randomUUID(), [0, 1, 2, 3]),
+    {
+      code: "PREVIEW_CONSUMED",
+    },
+  );
   const newPreview = await admin.preview("RIH-DEMO-C-080", 1, "entry");
   assert.equal(
-    (await admin.confirm(newPreview.id, crypto.randomUUID(), false)).code,
+    (await admin.confirm(newPreview.id, crypto.randomUUID(), [0, 1, 2, 3]))
+      .code,
     "CONFIRMED",
   );
   const history = (await admin.snapshot()).claims.filter(
@@ -207,7 +213,7 @@ test("expired previews, closed windows and assignment changes stop confirmation"
   const expired = await volunteer.preview("RIH-DEMO-C-080", 1, "lunch");
   advance(60000);
   await assert.rejects(
-    volunteer.confirm(expired.id, crypto.randomUUID(), true),
+    volunteer.confirm(expired.id, crypto.randomUUID(), [0, 1, 2, 3]),
     { code: "PREVIEW_EXPIRED" },
   );
   const preview = await volunteer.preview("RIH-DEMO-C-080", 1, "lunch");
@@ -215,12 +221,12 @@ test("expired previews, closed windows and assignment changes stop confirmation"
   const person = snapshot.staff.find((item) => item.id === "demo-lunch")!;
   await admin.assignStaff({ ...person, mode: "dinner" });
   await assert.rejects(
-    volunteer.confirm(preview.id, crypto.randomUUID(), true),
+    volunteer.confirm(preview.id, crypto.randomUUID(), [0, 1, 2, 3]),
     { code: "FORBIDDEN" },
   );
   await admin.assignStaff(person);
   await assert.rejects(
-    volunteer.confirm(preview.id, crypto.randomUUID(), true),
+    volunteer.confirm(preview.id, crypto.randomUUID(), [0, 1, 2, 3]),
     { code: "CONTEXT_CHANGED" },
   );
   const window = snapshot.schedules.find(
@@ -267,9 +273,12 @@ test("offline confirmations fail before a state change", async () => {
     value: false,
   });
   try {
-    await assert.rejects(admin.confirm(preview.id, crypto.randomUUID(), true), {
-      code: "OFFLINE",
-    });
+    await assert.rejects(
+      admin.confirm(preview.id, crypto.randomUUID(), [0, 1, 2, 3]),
+      {
+        code: "OFFLINE",
+      },
+    );
   } finally {
     Object.defineProperty(navigator, "onLine", {
       configurable: true,

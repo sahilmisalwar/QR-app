@@ -118,7 +118,7 @@ test("private tables are inaccessible and volunteers receive scoped fields", asy
   assert.deepEqual(snapshot.audit, []);
 });
 
-test("preview is read-only for claims and explicit full-team confirmation is required", async () => {
+test("preview is read-only for claims and explicit member selection is required", async () => {
   await actor(volunteer);
   const draft = await call("preview", { token, day: 1, mode: "lunch" });
   assert.equal(draft.decision, "ELIGIBLE");
@@ -128,9 +128,9 @@ test("preview is read-only for claims and explicit full-team confirmation is req
     call("confirm", {
       previewId: draft.id,
       requestId: crypto.randomUUID(),
-      fullTeam: false,
+      memberIndices: [],
     }),
-    /FULL_TEAM_REQUIRED/,
+    /MEMBERS_REQUIRED/,
   );
   assert.equal((await call("snapshot")).claims.length, 0);
 });
@@ -143,23 +143,27 @@ test("competing previews create one active claim and retries return the same rec
   const receipt = await call("confirm", {
     previewId: first.id,
     requestId,
-    fullTeam: true,
+    memberIndices: [0, 1],
   });
   assert.equal(receipt.code, "CONFIRMED");
   const duplicate = await call("confirm", {
     previewId: second.id,
     requestId: crypto.randomUUID(),
-    fullTeam: true,
+    memberIndices: [0, 1],
   });
   assert.equal(duplicate.code, "ALREADY_CONFIRMED");
   assert.equal(duplicate.claim.id, receipt.claim.id);
   assert.deepEqual(
-    await call("confirm", { previewId: first.id, requestId, fullTeam: true }),
+    await call("confirm", {
+      previewId: first.id,
+      requestId,
+      memberIndices: [0, 1],
+    }),
     receipt,
   );
   assert.deepEqual(await call("receipt", { requestId }), receipt);
   await assert.rejects(
-    call("confirm", { previewId: second.id, requestId, fullTeam: true }),
+    call("confirm", { previewId: second.id, requestId, memberIndices: [0, 1] }),
     /REQUEST_CONFLICT/,
   );
   assert.equal((await call("snapshot")).claims.length, 1);
@@ -191,7 +195,7 @@ test("QR reissue invalidates old tokens and preexisting previews while preservin
     call("confirm", {
       previewId: draft.id,
       requestId: crypto.randomUUID(),
-      fullTeam: true,
+      memberIndices: [0, 1],
     }),
     /CONTEXT_CHANGED/,
   );
@@ -212,7 +216,7 @@ test("assignment revocation and schedule revision invalidate a preview", async (
     call("confirm", {
       previewId: draft.id,
       requestId: crypto.randomUUID(),
-      fullTeam: true,
+      memberIndices: [0, 1],
     }),
     /CONTEXT_CHANGED/,
   );
@@ -233,7 +237,7 @@ test("assignment revocation and schedule revision invalidate a preview", async (
     call("confirm", {
       previewId: dinner.id,
       requestId: crypto.randomUUID(),
-      fullTeam: true,
+      memberIndices: [0, 1],
     }),
     /CONTEXT_CHANGED/,
   );

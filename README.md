@@ -10,7 +10,7 @@ The default launcher uses your configured Supabase project and requires an assig
 
 For sample data, open **Start Rehearsal.cmd**, or run `npm run dev:demo`, at **http://127.0.0.1:5174**. This separate mode offers an admin workspace and three volunteer checkpoints with 350 synthetic teams stored in browser IndexedDB. It does not synchronize between devices or provide production authentication. Reset rehearsal from Admin → Settings.
 
-Try **Unclaimed team** in a volunteer scanner to review members and explicitly confirm. Lunch and Dinner require the full-team checkbox. A second attempt displays the existing check-in. **CodeCrafters** demonstrates a duplicate. You can also generate a QR in Admin → QR Passes and scan its downloaded image in the volunteer flow.
+Try **Unclaimed team** in a volunteer scanner to review members and explicitly confirm. Select the members present at Entry, Lunch or Dinner. Scan the same pass again for the remaining members. Once everyone is checked in for that checkpoint and day, the scanner shows the team as complete. **CodeCrafters** demonstrates a duplicate. You can also generate a QR in Admin → QR Passes and scan its downloaded image in the volunteer flow.
 
 ## Included in this build
 

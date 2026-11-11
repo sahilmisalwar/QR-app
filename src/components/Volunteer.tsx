@@ -1,3 +1,4 @@
+import { confirmedMembers, memberCount } from "../lib/attendance";
 import { randomId } from "../lib/id";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
@@ -44,6 +45,7 @@ interface Props {
 interface PendingCommand {
   previewId: string;
   requestId: string;
+  memberIndices: number[];
 }
 type Screen = "home" | "scan" | "verify" | "result" | "pending";
 type Tab = "home" | "history" | "profile";
@@ -71,7 +73,7 @@ export function Volunteer({
   const [token, setToken] = useState("");
   const [preview, setPreview] = useState<Preview | null>(null);
   const [receipt, setReceipt] = useState<Receipt | null>(null);
-  const [fullTeam, setFullTeam] = useState(false);
+  const [selectedMembers, setSelectedMembers] = useState<number[]>([]);
   const [seconds, setSeconds] = useState(0);
   const pendingKey = `rih:pending:${user.id}`;
   const [pending, setPending] = useState<PendingCommand | null>(() => {
@@ -103,12 +105,10 @@ export function Volunteer({
     .filter((claim) => claim.day === user.day && claim.mode === mode)
     .sort((a, b) => b.at.localeCompare(a.at));
   const claims = history.filter((claim) => claim.status === "confirmed");
-  const eligibleIds = new Set(eligible.map((team) => team.id));
-  const completed = new Set(
-    claims
-      .filter((claim) => eligibleIds.has(claim.teamId))
-      .map((claim) => claim.teamId),
-  ).size;
+  const completed = eligible.filter(
+    (team) =>
+      confirmedMembers(claims, team, user.day, mode).size === memberCount(team),
+  ).length;
   const percent = eligible.length
     ? Math.round((completed / eligible.length) * 100)
     : 0;
@@ -198,7 +198,7 @@ export function Volunteer({
     setPreview(null);
     setReceipt(null);
     setToken("");
-    setFullTeam(false);
+    setSelectedMembers([]);
     setScreen("home");
   };
 
@@ -216,7 +216,7 @@ export function Volunteer({
           );
         const next = await gateway.preview(value.trim(), user.day, user.mode);
         setPreview(next);
-        setFullTeam(false);
+        setSelectedMembers([]);
         if (next.decision === "ALREADY_CONFIRMED" && next.previous) {
           setReceipt({ code: "ALREADY_CONFIRMED", claim: next.previous });
           setScreen("result");
@@ -307,7 +307,7 @@ export function Volunteer({
       const result = await gateway.confirm(
         command.previewId,
         command.requestId,
-        true,
+        command.memberIndices,
       );
       setReceipt(result);
       clearPending();
@@ -316,9 +316,13 @@ export function Volunteer({
     } catch (cause) {
       const definitive = new Set([
         "PREVIEW_EXPIRED",
+        "PREVIEW_CONSUMED",
+        "PREVIEW_INVALID",
         "CONTEXT_CHANGED",
         "WINDOW_CLOSED",
-        "FULL_TEAM_REQUIRED",
+        "MEMBERS_REQUIRED",
+        "INVALID_MEMBERS",
+        "MEMBERS_ALREADY_CHECKED_IN",
         "REQUEST_CONFLICT",
         "FORBIDDEN",
       ]);
@@ -625,8 +629,8 @@ export function Volunteer({
                       <strong>Every team needs your confirmation</strong>
                       <p>
                         {meal
-                          ? "Check every registered member is present before confirming the meal."
-                          : "Check the team details before confirming entry."}{" "}
+                          ? "Select the members receiving their meal now."
+                          : "Select the members entering now."}{" "}
                         Contact the event administrator for corrections or lost
                         passes.
                       </p>
@@ -821,13 +825,32 @@ export function Volunteer({
                 </div>
                 <div className="v-members">
                   <h3>Verify team members</h3>
-                  {preview.team.members.map((member, index) => (
-                    <div key={`${index}-${member}`}>
-                      <span>{String(index + 1).padStart(2, "0")}</span>
-                      {member}
-                      {index === 0 && <small>Team lead</small>}
-                    </div>
-                  ))}
+                  <p>Select the members present now.</p>
+                  {preview.team.members.map((member, index) => {
+                    const checkedIn =
+                      preview.checkedMemberIndices?.includes(index) ?? false;
+                    return (
+                      <label className="v-attestation" key={index}>
+                        <input
+                          type="checkbox"
+                          disabled={checkedIn || busy}
+                          checked={checkedIn || selectedMembers.includes(index)}
+                          onChange={(event) => {
+                            const checked = event.target.checked;
+                            setSelectedMembers((current) =>
+                              checked
+                                ? [...current, index].sort((a, b) => a - b)
+                                : current.filter((item) => item !== index),
+                            );
+                          }}
+                        />
+                        <span>
+                          {member}{" "}
+                          {checkedIn && <small>Already checked in</small>}
+                        </span>
+                      </label>
+                    );
+                  })}
                 </div>
                 <div className="v-eligibility">
                   <ShieldCheck size={21} />
@@ -841,32 +864,20 @@ export function Volunteer({
                     </span>
                   </div>
                 </div>
-                {meal && (
-                  <label className="v-attestation">
-                    <input
-                      type="checkbox"
-                      checked={fullTeam}
-                      onChange={(event) => setFullTeam(event.target.checked)}
-                    />
-                    <span>
-                      I have verified that{" "}
-                      <strong>
-                        all {preview.team.members.length} registered members
-                      </strong>{" "}
-                      are present together.
-                    </span>
-                  </label>
-                )}
                 <button
                   className="v-primary"
                   onClick={() =>
                     void confirm({
                       previewId: preview.id,
                       requestId: randomId(),
+                      memberIndices: selectedMembers,
                     })
                   }
                   disabled={
-                    busy || !online || seconds <= 0 || (meal && !fullTeam)
+                    busy ||
+                    !online ||
+                    seconds <= 0 ||
+                    selectedMembers.length === 0
                   }
                 >
                   <CheckCircle2 size={21} />
@@ -881,7 +892,7 @@ export function Volunteer({
                 </button>
                 <p className="v-confirm-note">
                   <LockKeyhole size={14} />
-                  One team check-in per checkpoint and event day
+                  Each member can check in once per checkpoint and event day
                 </p>
               </section>
             )}
@@ -907,7 +918,14 @@ export function Volunteer({
                 </h2>
                 <p>
                   {receipt.code === "CONFIRMED"
-                    ? `${label} has been confirmed for this team.`
+                    ? (receipt.claim.quantity ?? 0) +
+                      (receipt.claim.quantity === 1
+                        ? " member checked in. "
+                        : " members checked in. ") +
+                      (receipt.remainingCount === 0
+                        ? "Everyone has checked in for this checkpoint."
+                        : (receipt.remainingCount ?? 0) +
+                          " remaining can use the same QR.")
                     : receipt.code === "VOIDED"
                       ? "An administrator reversed this action. Please contact the event desk before serving."
                       : `${label} was already recorded for this team on Day ${receipt.claim.day}.`}
