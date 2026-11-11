@@ -766,6 +766,15 @@ export function createDemoGateway(options: DemoOptions = {}): Gateway {
         saveTeamRecord(state, input, actor, now());
       });
     },
+    async archiveTeam(teamId) {
+      return transaction((state) => {
+        const actor = requireActor(state, getSession(), true);
+        const team = state.teams.find((item) => item.id === teamId);
+        if (!team) throw new AppError("NOT_FOUND", "Team not found.");
+        if (team.active)
+          saveTeamRecord(state, { ...team, active: false }, actor, now());
+      });
+    },
     async importTeams(teams) {
       return transaction((state) => {
         const actor = requireActor(state, getSession(), true);

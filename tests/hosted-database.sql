@@ -78,6 +78,17 @@ begin
    perform api.call(e,'preview',jsonb_build_object('token',token,'day',1,'mode','lunch'));
    raise exception 'CHECK_FAILED: revoked pass accepted';
  exception when raise_exception then if sqlerrm not like 'INVALID_QR|%' then raise; end if; end;
+ perform api.call(e,'assign',jsonb_build_object('staff',jsonb_build_object('id',current_setting('test.volunteer'),'name','Verification volunteer','role','volunteer','day',2,'mode','dinner','active',true)));
+ if not exists(select from jsonb_array_elements(api.call(e,'snapshot','{}')->'staff') s where s->>'id'=current_setting('test.volunteer') and s->>'day'='2' and s->>'mode'='dinner') then
+   raise exception 'CHECK_FAILED: assignment to unscheduled checkpoint'; end if;
+ perform api.call(e,'archive_team',jsonb_build_object('teamId',t));
+ snapshot:=api.call(e,'snapshot','{}');
+ if snapshot->'teams'->0->>'active' is distinct from 'false' or jsonb_array_length(snapshot->'claims')<>1 then
+   raise exception 'CHECK_FAILED: team removal or history preservation'; end if;
+ begin
+   perform api.call(e,'preview',jsonb_build_object('token',rotated,'day',1,'mode','lunch'));
+   raise exception 'CHECK_FAILED: removed team pass accepted';
+ exception when raise_exception then if sqlerrm not like 'INVALID_QR|%' then raise; end if; end;
  perform set_config('request.jwt.claims','{}',true);
  begin
    perform api.call(e,'context','{}');
@@ -85,4 +96,4 @@ begin
  exception when raise_exception then if sqlerrm not like 'SESSION_EXPIRED|%' then raise; end if; end;
 end $$;
 rollback;
-select 'PASS: Vault, private tables, station roles, human confirmation, duplicate protection, idempotent retry, correction, QR rotation, session validation. All fixtures rolled back.' as result;
+select 'PASS: team removal, history preservation, unscheduled volunteer assignment, and scanner safeguards. All fixtures rolled back.' as result;

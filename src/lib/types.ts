@@ -84,6 +84,7 @@ export interface Gateway {
   ): Promise<Receipt>;
   commandStatus(requestId: string): Promise<Receipt | null>;
   saveTeam(team: Omit<Team, "id"> & { id?: string }): Promise<void>;
+  archiveTeam(teamId: string): Promise<void>;
   importTeams(teams: Array<Omit<Team, "id">>): Promise<void>;
   getPass(teamId: string): Promise<string>;
   rotatePass(teamId: string, reason: string): Promise<string>;

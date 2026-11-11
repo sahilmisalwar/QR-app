@@ -79,6 +79,9 @@ export function createSupabaseGateway(
     async saveTeam(team) {
       await call("save_team", { team });
     },
+    async archiveTeam(teamId) {
+      await call("archive_team", { teamId });
+    },
     async importTeams(teams) {
       await call("import_teams", { teams });
     },

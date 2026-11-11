@@ -906,14 +906,34 @@ export function Admin({ gateway, user, snapshot, refresh, onLogout }: Props) {
                             Pass
                           </button>
                           {page === "teams" && (
-                            <button
-                              className="text-button"
-                              onClick={() =>
-                                setDialog({ type: "team", team: t })
-                              }
-                            >
-                              Edit
-                            </button>
+                            <>
+                              <button
+                                className="text-button"
+                                onClick={() =>
+                                  setDialog({ type: "team", team: t })
+                                }
+                              >
+                                Edit
+                              </button>
+                              <button
+                                className="text-button"
+                                disabled={busy}
+                                onClick={() => {
+                                  if (
+                                    window.confirm(
+                                      `Remove ${t.name} from the active roster? Its QR pass will stop working and check-in history will be kept.`,
+                                    )
+                                  ) {
+                                    void run(
+                                      () => gateway.archiveTeam(t.id),
+                                      "Team removed",
+                                    );
+                                  }
+                                }}
+                              >
+                                Remove
+                              </button>
+                            </>
                           )}
                         </div>
                       </td>
@@ -1659,7 +1679,8 @@ export function Admin({ gateway, user, snapshot, refresh, onLogout }: Props) {
                 Allow access
               </label>
               <p className="form-note">
-                Existing previews become invalid when an assignment changes.
+                The volunteer can scan when the assigned checkpoint opens.
+                Assignment changes expire existing scan previews.
               </p>
               <button className="button primary" disabled={busy}>
                 Save assignment
