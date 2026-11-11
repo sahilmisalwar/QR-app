@@ -6,3 +6,4 @@ dist/
 *.tsbuildinfo
 test-results/
 supabase/.temp/
+docs/SUPABASE-STATUS.md

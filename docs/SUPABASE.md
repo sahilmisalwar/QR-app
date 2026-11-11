@@ -1,10 +1,12 @@
 # Supabase connection and production handoff
 
-The app is currently runnable in local rehearsal mode. This guide describes the steps for connecting an organizer-owned Supabase project. The migration has been exercised in embedded Postgres tests. It has not yet been applied to a live Supabase project.
+These instructions cover provisioning a new environment. If you are connecting to an existing event, use its project settings and event ID.
 
 ## Database and access
 
-The migration creates `ops` private tables and exposes one `api.call` function through an invoker wrapper. Its private dispatcher runs with the narrow non-login `rih_executor` role, checks the authenticated user's live session and active event membership, and enforces station scope. Browser roles have no direct table access. Table RLS and explicit grants protect the private data. A unique partial index permits one active claim per team, event day and checkpoint.
+The migrations create `ops` private tables and expose one `api.call` function through an invoker wrapper. Its private dispatcher runs with the non-login, non-bypass-RLS `rih_executor` role, checks the authenticated user's live session and active event membership, and enforces station scope. Browser roles have no direct table access. Table RLS and explicit grants protect the private data. A unique partial index permits one active claim per team, event day and checkpoint.
+
+Hosted Auth protects `auth.sessions` with RLS. A narrowly scoped private `ops.session_is_active()` helper owned by the migration role returns only whether the caller's own signed user/session pair exists. Its execution is granted only to the application executor, which cannot read Auth session rows directly. The executor inherits the standard authenticated role for Auth schema usage; browser users do not inherit the executor. The migration role retains ownership-management membership. Vault decryption permission is granted only to this trusted executor. The PostgREST authenticator exposes only `api`.
 
 Every successful confirmation saves its claim, receipt and audit entry together. A 60-second preview is bound to the actor, session, assignment, roster, pass version and service revision. Retries use the same request ID. Replacing a pass revokes the old digest while preserving team history. Supabase Vault encrypts each pass payload for authorized re-download. Include Vault in the recovery plan.
 
@@ -43,7 +45,9 @@ values
 
 Test that a user without event membership is rejected, disabled staff cannot act, volunteer tokens cannot export or update settings, assignments cannot be switched client-side, and private tables are inaccessible. Use two real sessions to confirm the same pass simultaneously and verify one active claim. Test lost responses, QR rotation during preview, session expiry, midnight service windows and schedule changes. Verify secure key handling and actual Vault decryption under the deployed function owner.
 
-PGlite tests mock Auth and Vault for transactional validation. They do not certify hosted permissions, MFA, Auth email delivery, network failure semantics or real concurrent database connections. Finish admin MFA, rate limiting, preview cleanup, registration integration, incident reconciliation and backup restore verification before deploying for participants. Read the release checklist in README.md.
+PGlite tests mock Auth and Vault for transactional validation. Hosted transactional checks separately verify actual database permissions and Vault. Administrator MFA is enforced in the deployed dispatcher and has been enrolled in the real account. Browser Auth contract tests use intercepted responses, so they do not certify email delivery, live logout or real concurrent database connections. Finish SMTP/redirect setup, rate limiting, preview cleanup, registration integration, incident reconciliation and backup restore verification before deploying for participants. Read the release checklist in README.md.
+
+Email recovery is disabled in the app until verified. Supabase's default email service only sends to project-team addresses; the app administrator's email differs from the project owner's email. Configure custom SMTP, add the actual HTTPS app origin to Auth redirect URLs, test a complete reset flow and only then set `VITE_EMAIL_RECOVERY_ENABLED=true`. See [Supabase SMTP guidance](https://supabase.com/docs/guides/auth/auth-smtp).
 
 ## Backups and retention
 

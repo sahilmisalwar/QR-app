@@ -71,6 +71,7 @@ export interface Receipt {
 }
 export interface Gateway {
   kind: "demo" | "supabase";
+  account?: AccountAccess;
   session(): Promise<Staff | null>;
   login(email: string, password: string): Promise<Staff>;
   demoLogin(role: Role, mode?: Mode): Promise<Staff>;
@@ -92,6 +93,15 @@ export interface Gateway {
   assignStaff(staff: Staff): Promise<void>;
   exportData(): Promise<Snapshot>;
   resetDemo(): Promise<void>;
+}
+export interface AccountAccess {
+  recoveryPending(): boolean;
+  subscribe(listener: (event: string) => void): () => void;
+  requestReset(email: string): Promise<void>;
+  updatePassword(password: string): Promise<void>;
+  mfaStatus(): Promise<{ verified: boolean; factorId?: string }>;
+  enrollMfa(): Promise<{ id: string; qr: string; secret: string }>;
+  verifyMfa(factorId: string, code: string): Promise<void>;
 }
 export const modes: Mode[] = ["entry", "lunch", "dinner"];
 export const labels: Record<Mode, string> = {

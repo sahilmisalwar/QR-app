@@ -11,11 +11,11 @@ const session = "30000000-0000-0000-0000-000000000001";
 let teamId: string;
 let token: string;
 
-async function actor(id: string) {
+async function actor(id: string, aal = "aal2") {
   await db.exec("reset role");
   await db.query(
     `select set_config('request.jwt.claim.sub',$1,false), set_config('request.jwt.claims',$2,false)`,
-    [id, JSON.stringify({ session_id: session })],
+    [id, JSON.stringify({ session_id: session, aal })],
   );
   await db.query("update auth.sessions set user_id=$1 where id=$2", [
     id,
@@ -88,6 +88,16 @@ before(async () => {
 });
 after(async () => {
   await db.close();
+});
+
+test("administrator data requires MFA, while context permits enrollment", async () => {
+  await actor(admin, "aal1");
+  assert.equal((await call("context")).role, "admin");
+  await assert.rejects(call("snapshot"), /MFA_REQUIRED/);
+  await assert.rejects(call("export"), /MFA_REQUIRED/);
+  await assert.rejects(call("save_team", { team: {} }), /MFA_REQUIRED/);
+  await actor(admin);
+  assert.equal((await call("snapshot")).teams.length, 1);
 });
 
 test("private tables are inaccessible and volunteers receive scoped fields", async () => {

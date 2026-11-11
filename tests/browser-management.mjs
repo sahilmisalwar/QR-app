@@ -9,7 +9,7 @@ const context = await browser.newContext({
 const page = await context.newPage();
 const errors = [];
 page.on("pageerror", (e) => errors.push(e.message));
-await page.goto("http://127.0.0.1:5173/");
+await page.goto("http://127.0.0.1:5174/");
 await page.getByRole("button", { name: "Open admin workspace" }).click();
 await page.getByRole("button", { name: "Add New Team", exact: true }).click();
 await page.getByRole("textbox", { name: "Team ID", exact: true }).fill("A-999");

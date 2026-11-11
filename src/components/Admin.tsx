@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Home,
   Users,
@@ -217,6 +217,48 @@ export function Admin({ gateway, user, snapshot, refresh, onLogout }: Props) {
   const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
   const [mobileMenu, setMobileMenu] = useState(false);
+  const sidebarRef = useRef<HTMLElement>(null);
+  const mainRef = useRef<HTMLElement>(null);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    mainRef.current?.scrollTo({ top: 0 });
+  }, [page]);
+
+  useEffect(() => {
+    if (!mobileMenu) return;
+    const sidebar = sidebarRef.current!;
+    const viewport = window.matchMedia("(max-width: 760px)");
+    const closeOnDesktop = () => {
+      if (!viewport.matches) setMobileMenu(false);
+    };
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        setMobileMenu(false);
+      }
+      if (event.key === "Tab") {
+        const buttons = sidebar.querySelectorAll<HTMLButtonElement>("button");
+        const first = buttons[0];
+        const last = buttons[buttons.length - 1];
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
+      }
+    };
+    sidebar.querySelector<HTMLButtonElement>(".sidebar-close")?.focus();
+    document.addEventListener("keydown", onKeyDown);
+    viewport.addEventListener("change", closeOnDesktop);
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+      viewport.removeEventListener("change", closeOnDesktop);
+      menuButtonRef.current?.focus({ preventScroll: true });
+    };
+  }, [mobileMenu]);
   const [limit, setLimit] = useState(25);
   const [qrImage, setQrImage] = useState("");
   const [rotateReason, setRotateReason] = useState("");
@@ -400,7 +442,7 @@ export function Admin({ gateway, user, snapshot, refresh, onLogout }: Props) {
     },
   ];
   return (
-    <div className="admin-app">
+    <div className={`admin-app ${mobileMenu ? "menu-open" : ""}`}>
       <a className="skip-link" href="#main">
         Skip to main content
       </a>
@@ -409,7 +451,29 @@ export function Admin({ gateway, user, snapshot, refresh, onLogout }: Props) {
         <Brand />
         <div className="masthead-end" />
       </header>
-      <aside className={`sidebar ${mobileMenu ? "is-open" : ""}`}>
+      {mobileMenu && (
+        <button
+          className="sidebar-backdrop"
+          aria-label="Dismiss navigation"
+          tabIndex={-1}
+          onClick={() => setMobileMenu(false)}
+        />
+      )}
+      <aside
+        ref={sidebarRef}
+        id="admin-navigation"
+        className={`sidebar ${mobileMenu ? "is-open" : ""}`}
+        role={mobileMenu ? "dialog" : undefined}
+        aria-modal={mobileMenu ? true : undefined}
+        aria-label="Admin navigation"
+      >
+        <button
+          className="sidebar-close"
+          aria-label="Close navigation"
+          onClick={() => setMobileMenu(false)}
+        >
+          <X size={18} />
+        </button>
         <div className="sidebar-title">
           <strong>
             RIH <span>2.0</span>
@@ -450,12 +514,15 @@ export function Admin({ gateway, user, snapshot, refresh, onLogout }: Props) {
           Sign out
         </button>
       </aside>
-      <main id="main" className="admin-main">
+      <main ref={mainRef} id="main" className="admin-main" inert={mobileMenu}>
         <div className="page-heading">
           <div className="heading-group">
             <button
               className="mobile-menu icon-button"
+              ref={menuButtonRef}
               aria-label="Toggle navigation"
+              aria-expanded={mobileMenu}
+              aria-controls="admin-navigation"
               onClick={() => setMobileMenu(!mobileMenu)}
             >
               <Menu />
@@ -1203,7 +1270,11 @@ export function Admin({ gateway, user, snapshot, refresh, onLogout }: Props) {
                 </div>
                 <div>
                   <dt>Operating days</dt>
-                  <dd>Two configured event days</dd>
+                  <dd>
+                    {snapshot.schedules.length
+                      ? `${new Set(snapshot.schedules.map((s) => s.day)).size} configured event days`
+                      : "Awaiting the event schedule"}
+                  </dd>
                 </div>
               </dl>
             </section>
@@ -1215,8 +1286,8 @@ export function Admin({ gateway, user, snapshot, refresh, onLogout }: Props) {
                 Operations.
               </p>
               <p>
-                Connect Supabase and import the approved registration roster
-                before distributing real passes.
+                Import the approved registration roster before distributing real
+                passes.
               </p>
               <button className="button" onClick={() => navigate("operations")}>
                 Configure checkpoints <ArrowRight size={17} />

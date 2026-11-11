@@ -1,3 +1,4 @@
+import { randomId } from "../lib/id";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   ArrowLeft,
@@ -865,7 +866,7 @@ export function Volunteer({
                   onClick={() =>
                     void confirm({
                       previewId: preview.id,
-                      requestId: crypto.randomUUID(),
+                      requestId: randomId(),
                     })
                   }
                   disabled={

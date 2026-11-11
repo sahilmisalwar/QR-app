@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { createAccountAccess } from "./account";
 import { AppError } from "./types";
 import type { Gateway, Staff, Snapshot, Preview, Receipt } from "./types";
 
@@ -14,6 +15,7 @@ export function createSupabaseGateway(
     );
   }
   const client = createClient(url, publishableKey);
+  const account = createAccountAccess(client);
 
   async function call<T>(operation: string, payload: object = {}): Promise<T> {
     if (!navigator.onLine)
@@ -37,9 +39,15 @@ export function createSupabaseGateway(
 
   return {
     kind: "supabase",
+    account,
     async session() {
       const { data, error } = await client.auth.getSession();
-      if (error || !data.session) return null;
+      if (error)
+        throw new AppError(
+          "SESSION_EXPIRED",
+          "Your session could not be restored. Sign in again.",
+        );
+      if (!data.session) return null;
       return call<Staff>("context");
     },
     async login(email, password) {
@@ -54,7 +62,12 @@ export function createSupabaseGateway(
       throw new AppError("FORBIDDEN", "Use your assigned staff account.");
     },
     async logout() {
-      await client.auth.signOut();
+      const { error } = await client.auth.signOut();
+      if (error)
+        throw new AppError(
+          "SIGN_OUT_FAILED",
+          "Could not end the session. Reconnect and try again.",
+        );
     },
     snapshot: () => call<Snapshot>("snapshot"),
     preview: (token, day, mode) =>

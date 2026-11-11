@@ -366,7 +366,12 @@ grant execute on function vault.create_secret(text,text,text,uuid) to rih_execut
 grant select,insert,update on all tables in schema ops to rih_executor;
 revoke update on ops.audit from rih_executor;
 grant execute on all functions in schema ops to rih_executor;
+-- Hosted Supabase's migration role is not a superuser. Ownership transfer
+-- needs role membership and temporary CREATE on the destination schema.
+do $$ begin execute format('grant rih_executor to %I', current_user); end $$;
+grant create on schema ops to rih_executor;
 alter function ops.dispatch(uuid,text,jsonb) owner to rih_executor;
+revoke create on schema ops from rih_executor;
 
 do $$ declare table_name text;
 begin

@@ -14,7 +14,7 @@ if not exist "node_modules" (
     exit /b 1
   )
 )
-echo Opening Rising India Hackathon at http://127.0.0.1:5173
+echo Opening the connected Rising India workspace at http://127.0.0.1:5173
 echo Keep this window open while using the app. Press Ctrl+C to stop.
 start "" "http://127.0.0.1:5173"
 call npm run dev -- --port 5173 --strictPort

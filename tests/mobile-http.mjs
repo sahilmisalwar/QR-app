@@ -1,0 +1,11 @@
+import { chromium } from '@playwright/test';
+const url = process.env.DEMO_HTTP_URL;
+if (!url) throw new Error('Set DEMO_HTTP_URL to the rehearsal server on your current Wi-Fi address (port 5174).');
+const browser = await chromium.launch({channel:'msedge',headless:true});
+const page = await browser.newPage({viewport:{width:390,height:844}});
+await page.goto(url);
+console.log('HTTP context:', await page.evaluate(()=>({secure:isSecureContext,uuid:typeof crypto.randomUUID})));
+await page.getByRole('button',{name:/Open admin workspace/}).click();
+await page.getByRole('heading',{name:'Event Overview',exact:true}).waitFor();
+console.log('Mobile HTTP admin login passed');
+await browser.close();

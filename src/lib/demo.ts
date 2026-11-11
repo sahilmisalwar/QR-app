@@ -1,3 +1,4 @@
+import { randomId } from "./id";
 import { AppError, modes } from "./types";
 import type {
   Audit,
@@ -337,7 +338,7 @@ function addAudit(
   now: number,
 ) {
   state.audit.unshift({
-    id: crypto.randomUUID(),
+    id: randomId(),
     at: new Date(now).toISOString(),
     actor: actor.name,
     action,
@@ -421,7 +422,7 @@ function saveTeamRecord(
       "This team code is already registered.",
     );
   const team: Team = {
-    id: existing?.id ?? crypto.randomUUID(),
+    id: existing?.id ?? randomId(),
     code,
     name: input.name.trim(),
     college: input.college.trim(),
@@ -557,7 +558,7 @@ export function createDemoGateway(options: DemoOptions = {}): Gateway {
       });
       storage().setItem(
         SESSION_KEY,
-        JSON.stringify({ actorId: actor.id, id: crypto.randomUUID() }),
+        JSON.stringify({ actorId: actor.id, id: randomId() }),
       );
       return actor;
     },
@@ -600,7 +601,7 @@ export function createDemoGateway(options: DemoOptions = {}): Gateway {
             item.status === "confirmed",
         );
         const preview: Preview = {
-          id: crypto.randomUUID(),
+          id: randomId(),
           team,
           mode,
           day,
@@ -726,7 +727,7 @@ export function createDemoGateway(options: DemoOptions = {}): Gateway {
               "This scan was already used. Start a fresh scan.",
             );
           const claim: Claim = {
-            id: crypto.randomUUID(),
+            id: randomId(),
             teamId: team.id,
             teamCode: team.code,
             teamName: team.name,

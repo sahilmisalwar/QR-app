@@ -4,14 +4,16 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite --host 127.0.0.1",
-    "build": "tsc -b && vite build",
+    "dev": "vite --mode supabase --host 127.0.0.1",
+    "dev:demo": "vite --mode demo --host 127.0.0.1 --port 5174 --strictPort",
+    "build": "tsc -b && vite build --mode supabase",
+    "build:demo": "tsc -b && vite build --mode demo",
     "preview": "vite preview --host 127.0.0.1",
     "test": "tsx --test tests/*.test.ts"
   },
   "dependencies": {
-    "@fontsource/manrope": "5.3.0",
-    "@fontsource/sora": "5.3.0",
+    "@fontsource-variable/outfit": "5.3.0",
+    "@fontsource-variable/plus-jakarta-sans": "5.3.0",
     "@supabase/supabase-js": "2.119.0",
     "@zxing/browser": "0.2.1",
     "lucide-react": "1.71.0",

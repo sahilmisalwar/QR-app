@@ -1,14 +1,20 @@
 import { useCallback, useEffect, useState } from "react";
 import { ArrowRight, ShieldCheck, WifiOff, LoaderCircle } from "lucide-react";
 import type { Gateway, Staff, Snapshot, Mode, Role } from "./lib/types";
-import { labels, modes } from "./lib/types";
+import { AppError, labels, modes } from "./lib/types";
 import { createDemoGateway } from "./lib/demo";
 import { createSupabaseGateway } from "./lib/supabase";
 import { Brand, ModeIcon } from "./components/shared";
 import { Admin } from "./components/Admin";
 import { Volunteer } from "./components/Volunteer";
+import { AdminVerification, PasswordSetup } from "./components/Account";
 
-const live = import.meta.env.VITE_DATA_MODE === "supabase";
+const live =
+  import.meta.env.MODE === "supabase" ||
+  (import.meta.env.MODE !== "demo" &&
+    import.meta.env.VITE_DATA_MODE === "supabase");
+const emailRecoveryEnabled =
+  import.meta.env.VITE_EMAIL_RECOVERY_ENABLED === "true";
 let configuredGateway: Gateway | undefined;
 let configurationError = "";
 try {
@@ -42,7 +48,16 @@ function Workspace({ gateway }: { gateway: Gateway }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const [recovering, setRecovering] = useState(
+    gateway.account?.recoveryPending() ?? false,
+  );
+  const [verified, setVerified] = useState(false);
+  const [resetForm, setResetForm] = useState(false);
+  const [notice, setNotice] = useState("");
+  const onVerified = useCallback(() => setVerified(true), []);
   const userId = user?.id;
+  const needsVerification =
+    !!gateway.account && user?.role === "admin" && !verified;
   const refresh = useCallback(async () => {
     try {
       const next = await gateway.snapshot();
@@ -53,9 +68,32 @@ function Workspace({ gateway }: { gateway: Gateway }) {
       );
       setError("");
     } catch (e) {
+      if (e instanceof AppError && e.code === "MFA_REQUIRED") {
+        setData(null);
+        setVerified(false);
+      }
+      if (
+        e instanceof AppError &&
+        ["SESSION_EXPIRED", "FORBIDDEN", "EVENT_CLOSED"].includes(e.code)
+      ) {
+        setUser(null);
+        setData(null);
+        setVerified(false);
+      }
       setError((e as Error).message);
       throw e;
     }
+  }, [gateway]);
+  useEffect(() => {
+    return gateway.account?.subscribe((event) => {
+      if (event === "PASSWORD_RECOVERY") setRecovering(true);
+      if (event === "SIGNED_OUT") {
+        setUser(null);
+        setData(null);
+        setVerified(false);
+        setRecovering(false);
+      }
+    });
   }, [gateway]);
   useEffect(() => {
     void gateway
@@ -65,7 +103,7 @@ function Workspace({ gateway }: { gateway: Gateway }) {
       .finally(() => setLoading(false));
   }, [gateway]);
   useEffect(() => {
-    if (!userId) return;
+    if (!userId || needsVerification || recovering) return;
     const update = () => {
       if (document.visibilityState === "visible")
         void refresh().catch(() => {});
@@ -79,7 +117,7 @@ function Workspace({ gateway }: { gateway: Gateway }) {
       window.removeEventListener("online", update);
       document.removeEventListener("visibilitychange", update);
     };
-  }, [userId, refresh]);
+  }, [userId, refresh, needsVerification, recovering]);
   async function login(
     email: string,
     password: string,
@@ -88,6 +126,8 @@ function Workspace({ gateway }: { gateway: Gateway }) {
   ) {
     setBusy(true);
     setError("");
+    setNotice("");
+    setVerified(false);
     try {
       setUser(
         role
@@ -101,10 +141,31 @@ function Workspace({ gateway }: { gateway: Gateway }) {
     }
   }
   async function logout() {
-    await gateway.logout();
-    setUser(null);
-    setData(null);
+    try {
+      await gateway.logout();
+      setUser(null);
+      setData(null);
+      setError("");
+      setRecovering(false);
+      setVerified(false);
+    } catch (e) {
+      setError((e as Error).message);
+    }
+  }
+  async function requestReset(email: string) {
+    setBusy(true);
     setError("");
+    setNotice("");
+    try {
+      await gateway.account!.requestReset(email);
+      setNotice(
+        "If this address has an account, a password reset link will arrive shortly. Contact the organizer if it does not arrive.",
+      );
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
   }
   if (loading)
     return (
@@ -112,6 +173,30 @@ function Workspace({ gateway }: { gateway: Gateway }) {
         <LoaderCircle className="spin" />
         Opening event operations…
       </div>
+    );
+  if (needsVerification && gateway.account)
+    return (
+      <AdminVerification
+        account={gateway.account}
+        sessionError={error}
+        onVerified={onVerified}
+        onLogout={() => void logout()}
+      />
+    );
+  if (recovering && gateway.account)
+    return (
+      <PasswordSetup
+        account={gateway.account}
+        sessionError={error}
+        onLogout={() => void logout()}
+        onDone={() => {
+          setUser(null);
+          setData(null);
+          setRecovering(false);
+          setVerified(false);
+          setNotice("Password saved. Sign in with your new password.");
+        }}
+      />
     );
   if (!user)
     return (
@@ -148,47 +233,91 @@ function Workspace({ gateway }: { gateway: Gateway }) {
           </section>
           <section className="login-card">
             <span className="eyebrow">EVENT OPERATIONS</span>
-            <h2>{live ? "Welcome back" : "Explore your event workspace"}</h2>
-            <p>
+            <h2>
               {live
-                ? "Sign in with your organizer-provided account."
-                : "Local rehearsal · 350 sample teams · Changes stay on this computer"}
+                ? resetForm
+                  ? "Account recovery"
+                  : "Welcome back"
+                : "Explore your event workspace"}
+            </h2>
+            <p>
+              {resetForm && !emailRecoveryEnabled
+                ? "Contact the event organizer to restore access to your staff account."
+                : live
+                  ? "Sign in with your organizer-provided account."
+                  : "Local rehearsal · 350 sample teams · Changes stay on this computer"}
             </p>
             {error && (
               <div className="error-banner" role="alert">
                 {error}
               </div>
             )}
+            {notice && (
+              <div className="account-notice" role="status">
+                {notice}
+              </div>
+            )}
             {live ? (
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  const f = new FormData(e.currentTarget);
-                  void login(String(f.get("email")), String(f.get("password")));
-                }}
-              >
-                <label>
-                  Email
-                  <input
-                    type="email"
-                    name="email"
-                    autoComplete="username"
-                    required
-                  />
-                </label>
-                <label>
-                  Password
-                  <input
-                    type="password"
-                    name="password"
-                    autoComplete="current-password"
-                    required
-                  />
-                </label>
-                <button className="button primary" disabled={busy}>
-                  Sign in <ArrowRight size={18} />
+              <>
+                {(!resetForm || emailRecoveryEnabled) && (
+                  <form
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      const f = new FormData(e.currentTarget);
+                      if (resetForm) void requestReset(String(f.get("email")));
+                      else
+                        void login(
+                          String(f.get("email")),
+                          String(f.get("password")),
+                        );
+                    }}
+                  >
+                    <label>
+                      Email
+                      <input
+                        type="email"
+                        name="email"
+                        autoComplete="username"
+                        required
+                      />
+                    </label>
+                    {!resetForm && (
+                      <label>
+                        Password
+                        <input
+                          type="password"
+                          name="password"
+                          autoComplete="current-password"
+                          required
+                        />
+                      </label>
+                    )}
+                    <button className="button primary" disabled={busy}>
+                      {busy
+                        ? "Please wait…"
+                        : resetForm
+                          ? "Send reset link"
+                          : "Sign in"}{" "}
+                      <ArrowRight size={18} />
+                    </button>
+                  </form>
+                )}
+                <button
+                  className="button account-back"
+                  disabled={busy}
+                  onClick={() => {
+                    setResetForm(!resetForm);
+                    setError("");
+                    setNotice("");
+                  }}
+                >
+                  {resetForm ? "Back to sign in" : "Forgot password?"}
                 </button>
-              </form>
+                <p className="login-footnote">
+                  Private staff workspace · Access is assigned by the event
+                  organizer.
+                </p>
+              </>
             ) : (
               <>
                 <button
@@ -245,7 +374,7 @@ function Workspace({ gateway }: { gateway: Gateway }) {
       </div>
     );
   return (
-    <>
+    <div className={user.role === "admin" ? "admin-workspace" : undefined}>
       {error && (
         <div className="connection-banner" role="status">
           <WifiOff size={16} />
@@ -269,6 +398,6 @@ function Workspace({ gateway }: { gateway: Gateway }) {
           onLogout={() => void logout()}
         />
       )}
-    </>
+    </div>
   );
 }

@@ -1,5 +1,7 @@
 :root {
-  font-family: "Manrope", sans-serif;
+  --font-body: "Plus Jakarta Sans Variable", sans-serif;
+  --font-display: "Outfit Variable", sans-serif;
+  font-family: var(--font-body);
   color: #092c38;
   background: #f5f7f8;
   font-synthesis: none;
@@ -7,7 +9,7 @@
   -webkit-font-smoothing: antialiased;
   --teal: #005763;
   --border: #dce5e9;
-  --shadow: 0 3px 5px #123b4610, 0 12px 26px #123b4609;
+  --shadow: 0 2px 4px #123b4608, 0 12px 30px #123b460d;
 }
 * {
   box-sizing: border-box;
@@ -59,19 +61,20 @@ p {
 h1,
 h2,
 h3 {
-  letter-spacing: -0.04em;
+  letter-spacing: -0.025em;
 }
 h1,
-h2 {
-  font-family: "Sora", sans-serif;
+h2,
+h3 {
+  font-family: var(--font-display);
 }
 h1 {
-  font-size: 27px;
-  line-height: 1.3;
-  font-weight: 600;
+  font-size: 30px;
+  line-height: 1.2;
+  font-weight: 650;
 }
 h2 {
-  font-size: 17px;
+  font-size: 18px;
   font-weight: 600;
   line-height: 1.4;
 }
@@ -349,10 +352,36 @@ details p {
   color: var(--accent, #005763);
 }
 /* The selected light desktop reference supplies the layout and palette. */
-.masthead {
-  height: 108px;
+.admin-workspace {
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+.admin-workspace > .connection-banner {
+  flex-shrink: 0;
+}
+.admin-app {
+  --masthead-height: 108px;
+  --sidebar-width: 228px;
   position: relative;
-  background: linear-gradient(125deg, #fff7eb, #fdfdfb 47%, #f4f8f8);
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
+  grid-template-rows: var(--masthead-height) minmax(0, 1fr);
+  overflow: hidden;
+}
+.masthead {
+  height: var(--masthead-height);
+  grid-column: 1 / -1;
+  position: relative;
+  background: linear-gradient(
+    115deg,
+    #fff1d9,
+    #fffdfa 40%,
+    #e6f4f2 78%,
+    #f3eafd
+  );
   border-bottom: 1px solid #e7e6df;
   box-shadow: 0 4px 12px #4d6c7210;
   overflow: hidden;
@@ -421,18 +450,31 @@ details p {
   transform: skewX(-38deg);
 }
 .sidebar {
-  position: fixed;
-  top: 108px;
-  bottom: 0;
-  width: 228px;
-  background: linear-gradient(150deg, #03343f 0%, #00343e 58%, #052d36 100%);
+  position: relative;
+  grid-column: 1;
+  grid-row: 2;
+  min-height: 0;
+  background:
+    radial-gradient(ellipse at 0 85%, #087c8052, transparent 60%),
+    linear-gradient(155deg, #063b47 0%, #00343e 55%, #092f40 100%);
   color: #e7f3f5;
   z-index: 30;
   display: flex;
   flex-direction: column;
   border-radius: 0 22px 0 0;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #568e98 transparent;
   padding: 25px 11px 14px;
+}
+.sidebar > * {
+  flex-shrink: 0;
+}
+.sidebar-close,
+.sidebar-backdrop {
+  display: none;
 }
 .sidebar:before {
   content: "";
@@ -456,9 +498,9 @@ details p {
   gap: 2px;
 }
 .sidebar-title strong {
-  font-family: "Sora";
+  font-family: var(--font-display);
   font-size: 25px;
-  letter-spacing: -0.06em;
+  letter-spacing: -0.025em;
 }
 .sidebar-title strong span {
   color: #e6eff0;
@@ -545,12 +587,19 @@ details p {
   font-size: 11px;
 }
 .admin-main {
-  margin-left: 228px;
+  grid-column: 2;
+  grid-row: 2;
+  min-width: 0;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
   padding: 26px 30px 12px;
-  min-height: calc(100vh - 108px);
   background:
-    radial-gradient(ellipse at 94% 0, #fff7ecaa, transparent 40%),
-    linear-gradient(#fbfbfc, #f3f6f8);
+    radial-gradient(ellipse at 0 0, #bceae166, transparent 52%),
+    radial-gradient(ellipse at 100% 12%, #ffdbad75, transparent 48%),
+    radial-gradient(ellipse at 90% 95%, #ddd1f766, transparent 52%),
+    linear-gradient(140deg, #f5faf8, #fbf8f4 48%, #f3f4fa);
 }
 .page-heading {
   display: flex;
@@ -753,15 +802,17 @@ details p {
   z-index: 1;
 }
 .stat-values > strong {
-  font-family: "Sora";
-  font-size: 29px;
-  letter-spacing: -0.07em;
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.035em;
   white-space: nowrap;
 }
 .stat-values > strong > span {
   font-size: 19px;
   font-weight: 500;
-  letter-spacing: -0.06em;
+  letter-spacing: -0.025em;
 }
 .small-ring {
   width: 58px;
@@ -809,7 +860,7 @@ details p {
     0 -20px 0 color-mix(in srgb, var(--accent, #008994) 4%, transparent);
 }
 .remaining-count {
-  font-family: "Sora";
+  font-family: var(--font-display);
   font-size: 32px;
   font-weight: 600;
   margin-top: 13px;
@@ -827,7 +878,8 @@ details p {
   margin-bottom: 18px;
 }
 .panel {
-  background: linear-gradient(125deg, #fff, #ffffffc2);
+  min-width: 0;
+  background: linear-gradient(125deg, #fffffff5, #ffffffcc);
   border: 1px solid #dce3e7;
   border-radius: 15px;
   padding: 19px;
@@ -883,7 +935,7 @@ details p {
   box-shadow: 0 2px 8px #073e4410;
 }
 .large-ring strong {
-  font-family: "Sora";
+  font-family: var(--font-display);
   font-size: 29px;
   letter-spacing: -0.04em;
   color: #00616d;
@@ -922,7 +974,7 @@ details p {
   color: #54808c;
 }
 .progress-metrics strong {
-  font-family: "Sora";
+  font-family: var(--font-display);
   font-size: 19px;
   font-weight: 500;
 }
@@ -1563,7 +1615,10 @@ details p {
 .login-page {
   min-height: 100vh;
   background:
-    radial-gradient(ellipse at 90% 15%, #fff0d9, transparent 50%), #f5f9fa;
+    radial-gradient(ellipse at 3% 12%, #a6e2d86b, transparent 48%),
+    radial-gradient(ellipse at 97% 22%, #ffd29a80, transparent 50%),
+    radial-gradient(ellipse at 70% 100%, #d4c1f880, transparent 55%),
+    linear-gradient(135deg, #f1faf7, #fff8ee 55%, #f2effb);
 }
 .login-top {
   height: 120px;
@@ -1586,14 +1641,20 @@ details p {
   color: #8d772d;
 }
 .login-intro h1 {
-  font-size: 43px;
-  line-height: 1.35;
-  letter-spacing: -0.055em;
+  font-size: 52px;
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
   margin: 22px 0;
 }
 .login-intro em {
   font-style: normal;
   color: #087382;
+  background: linear-gradient(105deg, #005d71, #168a7b);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 .login-intro p {
   font-size: 14px;
@@ -1621,22 +1682,88 @@ details p {
   width: 18px;
 }
 .login-card {
-  background: #fffc;
-  border: 1px solid #dce6e9;
+  background: linear-gradient(145deg, #fffffff0, #ffffffc4);
+  border: 1px solid #fff;
   border-radius: 23px;
-  box-shadow: 0 10px 40px #133c4510;
+  box-shadow:
+    0 20px 65px #253c5912,
+    inset 0 1px 0 #fff;
   padding: 35px;
+}
+.account-page {
+  min-height: 100dvh;
+}
+.account-card {
+  width: min(100% - 32px, 500px);
+  margin: 48px auto;
+}
+.account-card h1 {
+  font-size: clamp(26px, 5vw, 34px);
+  line-height: 1.12;
+  margin: 18px 0;
+}
+.account-icon {
+  color: #00616d;
+  background: #dff4ef;
+  border-radius: 18px;
+  padding: 14px;
+  width: fit-content;
+  margin: 20px 0;
+}
+.account-back {
+  margin-top: 18px;
+  width: 100%;
+}
+.account-notice {
+  background: #e3f5ee;
+  color: #145443;
+  border: 1px solid #afd7c6;
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 18px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.auth-enrollment {
+  margin: 18px 0;
+}
+.auth-enrollment img {
+  display: block;
+  background: white;
+  border-radius: 12px;
+  max-width: 100%;
+  margin: 18px auto;
+}
+.auth-enrollment details {
+  margin: 16px 0;
+}
+.auth-enrollment summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+.auth-enrollment code {
+  display: block;
+  overflow-wrap: anywhere;
+  padding: 14px;
+  background: #f2f6f5;
+  margin-top: 12px;
+}
+.auth-enrollment p {
+  font-size: 13px;
+  line-height: 1.7;
 }
 .login-card > .eyebrow {
   color: #7b949c;
 }
 .login-card h2 {
-  font-size: 22px;
+  font-size: 27px;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
   margin: 12px 0;
 }
 .login-card > p {
   font-size: 12px;
-  color: #7d9098;
+  color: #627982;
   line-height: 1.7;
   margin-bottom: 27px;
 }
@@ -1666,7 +1793,9 @@ details p {
   flex: 1;
 }
 .demo-admin strong {
-  font-size: 13px;
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 600;
 }
 .demo-admin small {
   font-size: 10px;
@@ -1678,7 +1807,7 @@ details p {
 .divider-label {
   font-size: 9px;
   letter-spacing: 0.15em;
-  color: #8a9da4;
+  color: #657d86;
   margin: 26px 0 13px;
   font-weight: 700;
 }
@@ -1709,7 +1838,7 @@ details p {
   font-size: 10px;
   margin-top: 23px;
   margin-bottom: 0;
-  color: #8a9ba3;
+  color: #627982;
 }
 .login-footer {
   max-width: 1100px;
@@ -1746,11 +1875,10 @@ details p {
   }
 }
 @media (max-width: 1200px) {
-  .sidebar {
-    width: 202px;
+  .admin-app {
+    --sidebar-width: 202px;
   }
   .admin-main {
-    margin-left: 202px;
     padding: 23px 22px;
   }
   .masthead .brand-lockup {
@@ -1811,6 +1939,9 @@ details p {
   }
   .panel-heading h2 {
     font-size: 14px;
+  }
+  .panel-heading {
+    flex-wrap: wrap;
   }
   .panel-heading small {
     font-size: 9px;
@@ -1899,8 +2030,9 @@ details p {
   }
 }
 @media (max-width: 760px) {
-  .masthead {
-    height: 87px;
+  .admin-app {
+    --masthead-height: 87px;
+    grid-template-columns: minmax(0, 1fr);
   }
   .masthead .brand-lockup {
     margin: 0;
@@ -1929,22 +2061,58 @@ details p {
     opacity: 0.15;
   }
   .sidebar {
-    top: 87px;
+    position: absolute;
+    grid-area: auto;
+    top: var(--masthead-height);
+    left: 0;
+    bottom: 0;
+    visibility: hidden;
     transform: translateX(-100%);
     transition: transform 0.2s;
     width: 228px;
     box-shadow: 20px 0 30px #00263022;
   }
   .sidebar.is-open {
+    visibility: visible;
     transform: translateX(0);
   }
+  .sidebar-close {
+    display: grid;
+    place-items: center;
+    position: absolute;
+    top: 12px;
+    right: 9px;
+    width: 36px;
+    height: 36px;
+    border: 1px solid #ffffff30;
+    border-radius: 9px;
+    background: #ffffff10;
+    color: white;
+  }
+  .sidebar-backdrop {
+    display: block;
+    position: absolute;
+    inset: var(--masthead-height) 0 0;
+    background: #062c3870;
+    border: 0;
+    z-index: 25;
+  }
+  .admin-app.menu-open .admin-main {
+    overflow: hidden;
+  }
   .admin-main {
-    margin-left: 0;
+    grid-column: 1;
     padding: 22px 16px;
   }
   .page-heading {
+    position: sticky;
+    top: -22px;
+    z-index: 12;
+    margin: -22px -16px 20px;
+    padding: 18px 16px;
+    background: linear-gradient(110deg, #eef8f5, #faf4e9);
+    border-bottom: 1px solid #dce5e9;
     gap: 12px;
-    margin-bottom: 20px;
   }
   .page-heading h1 {
     font-size: 22px;
@@ -2035,8 +2203,8 @@ details p {
     font-size: 9px;
   }
   .overall-content {
-    gap: 30px;
-    padding: 8px;
+    gap: 16px;
+    padding: 8px 0;
   }
   .large-ring {
     width: 131px;
@@ -2125,7 +2293,7 @@ details p {
     max-width: 520px;
   }
   .login-intro h1 {
-    font-size: 33px;
+    font-size: 38px;
     margin: 15px 0;
   }
   .login-intro p {
@@ -2167,6 +2335,12 @@ details p {
   }
 }
 @media print {
+  .admin-workspace,
+  .admin-app,
+  .admin-main {
+    height: auto;
+    overflow: visible;
+  }
   body * {
     visibility: hidden;
   }
