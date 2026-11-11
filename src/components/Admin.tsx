@@ -1,3 +1,4 @@
+import * as QR from "qrcode";
 import { confirmedMembers, memberCount } from "../lib/attendance";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -335,7 +336,6 @@ export function Admin({ gateway, user, snapshot, refresh, onLogout }: Props) {
   async function openPass(team: Team) {
     await run(async () => {
       const token = await gateway.getPass(team.id);
-      const QR = await import("qrcode");
       setQrImage(
         await QR.toDataURL(token, {
           width: 480,
@@ -1526,7 +1526,6 @@ export function Admin({ gateway, user, snapshot, refresh, onLogout }: Props) {
                         dialog.team.id,
                         rotateReason,
                       );
-                      const QR = await import("qrcode");
                       setQrImage(
                         await QR.toDataURL(token, { width: 480, margin: 4 }),
                       );
