@@ -349,7 +349,11 @@ export function Admin({ gateway, user, snapshot, refresh, onLogout }: Props) {
       setDialog({ type: "pass", team, token });
     });
   }
-  async function exportRecords(kind: "claims" | "teams" | "audit") {
+  async function exportRecords(
+    kind: "claims" | "teams" | "audit",
+    checkpoint?: Mode,
+  ) {
+    const reportMode = checkpoint ?? modeFilter;
     await run(async () => {
       const exported = await gateway.exportData();
       let rows: unknown[][];
@@ -373,7 +377,7 @@ export function Admin({ gateway, user, snapshot, refresh, onLogout }: Props) {
               (c) =>
                 c.day === day &&
                 (category === "all" || c.category === category) &&
-                (modeFilter === "all" || c.mode === modeFilter),
+                (reportMode === "all" || c.mode === reportMode),
             )
             .map((c) => [
               c.teamCode,
@@ -409,7 +413,7 @@ export function Admin({ gateway, user, snapshot, refresh, onLogout }: Props) {
           ...exported.audit.map((a) => [a.at, a.actor, a.action, a.detail]),
         ];
       downloadFile(
-        `RIH-${kind}-day-${day}-${new Date().toISOString().slice(0, 10)}.csv`,
+        `RIH-${checkpoint ?? kind}-day-${day}-${new Date().toISOString().slice(0, 10)}.csv`,
         "\uFEFF" + rows.map((r) => r.map(csvCell).join(",")).join("\r\n"),
       );
     }, "Export downloaded");
@@ -1248,14 +1252,29 @@ export function Admin({ gateway, user, snapshot, refresh, onLogout }: Props) {
                   <span className="file-label">
                     CSV · Spreadsheet compatible
                   </span>
-                  <button
-                    className="button primary"
-                    disabled={busy}
-                    onClick={() => void exportRecords(r.kind)}
-                  >
-                    <Download size={17} />
-                    Download report
-                  </button>
+                  {r.kind === "claims" ? (
+                    <div className="button-row">
+                      {modes.map((mode) => (
+                        <button
+                          key={mode}
+                          className="button primary"
+                          disabled={busy}
+                          onClick={() => void exportRecords("claims", mode)}
+                        >
+                          <Download size={17} /> Download {labels[mode]}
+                        </button>
+                      ))}
+                    </div>
+                  ) : (
+                    <button
+                      className="button primary"
+                      disabled={busy}
+                      onClick={() => void exportRecords(r.kind)}
+                    >
+                      <Download size={17} />
+                      Download report
+                    </button>
+                  )}
                 </section>
               ))}
             </div>
