@@ -1,9 +1,5 @@
 import * as QR from "qrcode";
-import {
-  confirmedMembers,
-  memberCount,
-  memberProgress,
-} from "../lib/attendance";
+import { confirmedMembers, memberCount } from "../lib/attendance";
 import { useEffect, useRef, useState } from "react";
 import {
   Home,
@@ -100,14 +96,10 @@ function StatCard({
   mode,
   count,
   total,
-  completeTeams,
-  teamCount,
 }: {
   mode: Mode;
   count: number;
   total: number;
-  completeTeams: number;
-  teamCount: number;
 }) {
   const percent = total ? Math.round((count / total) * 100) : 0;
   return (
@@ -130,9 +122,6 @@ function StatCard({
           <b>{total ? `${percent}%` : "—"}</b>
         </div>
       </div>
-      <small>
-        Members checked in � {completeTeams}/{teamCount} teams complete
-      </small>
       <div className="stat-wave" />
     </article>
   );
@@ -290,16 +279,20 @@ export function Admin({ gateway, user, snapshot, refresh, onLogout }: Props) {
       const schedule = snapshot.schedules.find(
         (s) => s.day === day && s.mode === mode,
       );
-      const hasCheckIns = snapshot.claims.some(
-        (claim) =>
-          claim.day === day &&
-          claim.mode === mode &&
-          claim.status === "confirmed",
-      );
-      const teams = schedule?.enabled || hasCheckIns ? teamScope : [];
-      return [mode, memberProgress(snapshot.claims, teams, day, mode)];
+      const teams = schedule?.enabled ? teamScope : [];
+      return [
+        mode,
+        {
+          total: teams.length,
+          count: teams.filter(
+            (team) =>
+              confirmedMembers(snapshot.claims, team, day, mode).size ===
+              memberCount(team),
+          ).length,
+        },
+      ];
     }),
-  ) as Record<Mode, ReturnType<typeof memberProgress>>;
+  ) as Record<Mode, { total: number; count: number }>;
   const eligible = modes.reduce((sum, m) => sum + totals[m].total, 0);
   const completed = modes.reduce((sum, m) => sum + totals[m].count, 0);
   const overall = eligible ? Math.round((completed / eligible) * 100) : 0;
@@ -661,7 +654,7 @@ export function Admin({ gateway, user, snapshot, refresh, onLogout }: Props) {
                 <div className="remaining-count">
                   {totals.lunch.total - totals.lunch.count}
                 </div>
-                <small>of {totals.lunch.total} members</small>
+                <small>of {totals.lunch.total} eligible teams</small>
                 <div className="stat-wave" />
               </article>
             </section>
@@ -696,21 +689,21 @@ export function Admin({ gateway, user, snapshot, refresh, onLogout }: Props) {
                     <div>
                       <span>
                         <Check className="green-icon" />
-                        Member check-ins completed
+                        Completed
                       </span>
                       <strong>{completed.toLocaleString()}</strong>
                     </div>
                     <div>
                       <span>
                         <Clock3 />
-                        Member check-ins remaining
+                        Remaining
                       </span>
                       <strong>{(eligible - completed).toLocaleString()}</strong>
                     </div>
                     <div>
                       <span>
                         <Users />
-                        Member check-ins due
+                        Eligible actions
                       </span>
                       <strong>{eligible.toLocaleString()}</strong>
                     </div>
@@ -749,8 +742,7 @@ export function Admin({ gateway, user, snapshot, refresh, onLogout }: Props) {
                   ))}
                 </div>
                 <p className="panel-note">
-                  Each confirmed member contributes to progress. A team is
-                  complete once all its members check in.
+                  A team counts as complete once all its members check in.
                 </p>
               </section>
             </div>
