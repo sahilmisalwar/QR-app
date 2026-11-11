@@ -1058,29 +1058,47 @@
   margin: 20px 0;
 }
 .v-members h3 {
-  font-size: 13px;
-  margin-bottom: 14px;
+  font-size: 16px;
+  margin-bottom: 6px;
 }
-.v-members > div {
-  display: flex;
+.v-members > p {
+  margin-bottom: 12px;
+}
+.v-member-row {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
   align-items: center;
-  gap: 9px;
+  gap: 12px;
+  min-height: 56px;
+  padding: 10px 12px;
+  margin-top: 8px;
+  border: 1px solid #dbe2e6;
+  border-radius: 12px;
+  background: #fff;
+  color: var(--v-ink);
+  cursor: pointer;
+}
+.v-member-row:has(input:checked) {
+  background: var(--v-soft);
+  border-color: var(--v-accent);
+}
+.v-member-row:has(input:disabled) {
+  cursor: default;
+}
+.v-member-details {
+  display: grid;
+  gap: 2px;
+  overflow-wrap: anywhere;
+}
+.v-member-details strong {
+  font-size: 17px;
+  font-weight: 750;
+  line-height: 1.25;
+}
+.v-member-details small {
+  color: var(--v-accent-dark);
   font-size: 12px;
-  line-height: 1.5;
-  margin: 11px 0;
-}
-.v-members > div > span {
-  color: #71828d;
-  font-size: 9px;
-  width: 20px;
-}
-.v-members small {
-  font-size: 8px;
-  background: #edf1f4;
-  border-radius: 5px;
-  color: #6b7984;
-  padding: 2px 5px;
-  margin-left: auto;
+  font-weight: 600;
 }
 .v-eligibility {
   display: flex;
@@ -1105,21 +1123,11 @@
   font-size: 9px;
   line-height: 1.5;
 }
-.v-attestation {
-  display: flex;
-  align-items: flex-start;
-  gap: 9px;
-  font-size: 11px;
-  line-height: 1.7;
-  color: #385462;
-  margin: 18px 0;
-}
-.v-attestation input {
-  margin-top: 3px;
+.v-member-row input {
+  margin: 0;
   accent-color: var(--v-accent);
-  width: 18px;
-  height: 18px;
-  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
 }
 .v-team-card > .v-primary {
   font-size: 13px;

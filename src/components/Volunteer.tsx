@@ -830,7 +830,7 @@ export function Volunteer({
                     const checkedIn =
                       preview.checkedMemberIndices?.includes(index) ?? false;
                     return (
-                      <label className="v-attestation" key={index}>
+                      <label className="v-member-row" key={index}>
                         <input
                           type="checkbox"
                           disabled={checkedIn || busy}
@@ -844,8 +844,8 @@ export function Volunteer({
                             );
                           }}
                         />
-                        <span>
-                          {member}{" "}
+                        <span className="v-member-details">
+                          <strong>{member}</strong>
                           {checkedIn && <small>Already checked in</small>}
                         </span>
                       </label>
