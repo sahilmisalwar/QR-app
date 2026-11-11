@@ -1,4 +1,4 @@
-import { confirmedMembers, memberCount } from "../lib/attendance";
+import { memberProgress } from "../lib/attendance";
 import { randomId } from "../lib/id";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
@@ -98,20 +98,23 @@ export function Volunteer({
   const schedule = snapshot.schedules.find(
     (item) => item.day === user.day && item.mode === mode,
   );
-  const eligible = schedule?.enabled
-    ? snapshot.teams.filter((team) => team.active)
-    : [];
+  const activeTeams = snapshot.teams.filter((team) => team.active);
   const history = snapshot.claims
     .filter((claim) => claim.day === user.day && claim.mode === mode)
     .sort((a, b) => b.at.localeCompare(a.at));
   const claims = history.filter((claim) => claim.status === "confirmed");
-  const completed = eligible.filter(
-    (team) =>
-      confirmedMembers(claims, team, user.day, mode).size === memberCount(team),
-  ).length;
-  const percent = eligible.length
-    ? Math.round((completed / eligible.length) * 100)
-    : 0;
+  const {
+    count: completed,
+    total,
+    completeTeams,
+    teamCount,
+  } = memberProgress(
+    claims,
+    schedule?.enabled || claims.length > 0 ? activeTeams : [],
+    user.day,
+    mode,
+  );
+  const percent = total ? Math.round((completed / total) * 100) : 0;
   const last = claims[0];
   const meal = mode !== "entry";
   const fresh = Date.now() - new Date(snapshot.serverTime).getTime() < 20000;
@@ -444,7 +447,7 @@ export function Volunteer({
                 <>
                   <section
                     className="v-progress-card"
-                    aria-label={`${completed} of ${eligible.length} eligible teams checked in`}
+                    aria-label={`${completed} of ${total} members checked in`}
                   >
                     <div className="v-progress-caption">
                       {label} progress <CheckpointIcon size={24} />
@@ -452,8 +455,8 @@ export function Volunteer({
                     <div className="v-progress-numbers">
                       <div>
                         <strong>{completed}</strong>
-                        <span> / {eligible.length}</span>
-                        <small>Teams checked in</small>
+                        <span> / {total}</span>
+                        <small>Members checked in</small>
                       </div>
                       <div className="v-percent">
                         <strong>
@@ -473,9 +476,12 @@ export function Volunteer({
                       </span>
                       <span>
                         <Clock3 size={17} />
-                        {Math.max(0, eligible.length - completed)} remaining
+                        {total - completed} remaining
                       </span>
                     </div>
+                    <small>
+                      {completeTeams} of {teamCount} teams complete
+                    </small>
                   </section>
                   <section className="v-scanner-card">
                     <div className="v-scanner-corners" />
