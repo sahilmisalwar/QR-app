@@ -143,7 +143,7 @@ function HistoryTable({
 }) {
   return (
     <div className="table-scroll">
-      <table className="data-table">
+      <table className="data-table history-table">
         <thead>
           <tr>
             <th>Team ID</th>
@@ -162,25 +162,27 @@ function HistoryTable({
         <tbody>
           {claims.map((c) => (
             <tr key={c.id}>
-              <td>
+              <td className="record-code">
                 <span className="team-code">{c.teamCode}</span>
               </td>
-              <td className="team-name">
+              <td className="team-name record-name">
                 {c.teamName}
                 {c.memberNames?.length ? (
                   <small>{c.memberNames.join(", ")}</small>
                 ) : null}
               </td>
-              <td>
+              <td data-label="Category">
                 <span className={`category-badge cat-${c.category}`}>
                   {c.category}
                 </span>
               </td>
-              <td>
+              <td data-label="Checkpoint">
                 <Badge mode={c.mode} />
               </td>
-              <td className="muted nowrap">{formatTime(c.at)}</td>
-              <td>
+              <td data-label="Time" className="muted nowrap">
+                {formatTime(c.at)}
+              </td>
+              <td data-label="Status">
                 {c.status === "confirmed" ? (
                   <span className="success-check" aria-label="Confirmed">
                     <Check size={13} />
@@ -190,7 +192,7 @@ function HistoryTable({
                 )}
               </td>
               {onVoid && (
-                <td>
+                <td className="record-actions">
                   {c.status === "confirmed" && (
                     <button className="text-button" onClick={() => onVoid(c)}>
                       Correct
@@ -736,7 +738,7 @@ export function Admin({ gateway, user, snapshot, refresh, onLogout }: Props) {
                   ))}
                 </div>
                 <p className="panel-note">
-                  Each team has one entitlement per checkpoint and event day.
+                  A team counts as complete once all its members check in.
                 </p>
               </section>
             </div>
@@ -867,20 +869,23 @@ export function Admin({ gateway, user, snapshot, refresh, onLogout }: Props) {
                 <tbody>
                   {teams.slice(0, limit).map((t) => (
                     <tr key={t.id}>
-                      <td>
+                      <td className="record-code">
                         <span className="team-code">{t.code}</span>
                       </td>
-                      <td>
+                      <td className="record-name">
                         <strong>{t.name}</strong>
                         <small>{t.college}</small>
                       </td>
-                      <td>
+                      <td data-label="Category">
                         <span className={`category-badge cat-${t.category}`}>
                           {t.category}
                         </span>
                       </td>
-                      <td>{t.members.length}</td>
-                      <td>
+                      <td data-label="Members">{t.members.length}</td>
+                      <td
+                        className="record-progress"
+                        data-label={`Day ${day} progress`}
+                      >
                         <div className="team-status">
                           {modes.map((m) => {
                             const checked = confirmedMembers(
@@ -910,7 +915,7 @@ export function Admin({ gateway, user, snapshot, refresh, onLogout }: Props) {
                           })}
                         </div>
                       </td>
-                      <td>
+                      <td className="record-actions">
                         <div className="button-row">
                           <button
                             className="text-button"

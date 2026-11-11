@@ -1,0 +1,247 @@
+.admin-main {
+  --admin-line: #e0e8ec;
+  --admin-panel-shadow: 0 2px 4px #112c3a06, 0 12px 28px #203f5110;
+  background:
+    radial-gradient(ellipse at 5% 0, #d5efea, transparent 45%),
+    radial-gradient(ellipse at 98% 4%, #fff0db, transparent 43%),
+    linear-gradient(150deg, #f4f8f9, #f4f3fb);
+}
+.admin-main .panel {
+  background: #fff;
+  border: 1px solid var(--admin-line);
+  border-radius: 19px;
+  padding: clamp(16px, 1.65vw, 25px);
+  box-shadow: var(--admin-panel-shadow);
+}
+.admin-main .panel-heading {
+  padding-bottom: 13px;
+  border-bottom: 1px solid #edf1f3;
+}
+.admin-main .panel-heading h2,
+.admin-main .section-toolbar h2 {
+  font-size: clamp(17px, 1.5vw, 21px);
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+}
+.admin-main .panel-heading h2 > svg {
+  box-sizing: content-box;
+  padding: 7px;
+  width: 17px;
+  height: 17px;
+  border-radius: 10px;
+  background: #eaf5f4;
+  color: #00636d;
+  flex: none;
+}
+.admin-main .panel-heading small,
+.admin-main .panel-note {
+  font-size: 11px;
+  color: #526b78;
+}
+.admin-main .stat-card {
+  box-shadow: var(--admin-panel-shadow);
+  border-radius: 18px;
+}
+.admin-main .stat-values,
+.admin-main .remaining-count,
+.admin-main .progress-metrics strong {
+  font-variant-numeric: tabular-nums;
+}
+.admin-main .progress-metrics > div {
+  padding-block: 12px;
+}
+.admin-main .quick-actions {
+  gap: 12px;
+}
+.admin-main .quick-actions button {
+  border-radius: 14px;
+  min-height: 96px;
+  padding: 10px;
+  text-align: center;
+}
+.admin-main .quick-actions strong {
+  font-size: 12px;
+  line-height: 1.35;
+}
+.admin-main .table-scroll {
+  border-radius: 11px;
+}
+.admin-main .data-table {
+  font-size: 12px;
+}
+.admin-main .data-table thead {
+  background: #eef3f6;
+  font-size: 11px;
+}
+.admin-main .data-table :is(th, td) {
+  padding: 11px 10px;
+}
+.admin-main .data-table td small {
+  display: block;
+  margin-top: 4px;
+  color: #526b78;
+  font-size: 11px;
+  font-weight: 500;
+}
+.admin-main .record-name {
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+.admin-main .record-name small {
+  white-space: normal;
+}
+.admin-main .team-status {
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.admin-main .team-status > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  width: auto;
+  min-height: 27px;
+  padding: 3px 7px;
+  font-size: 11px;
+  font-weight: 750;
+  color: var(--accent, #526b78);
+}
+.admin-main .team-status svg {
+  flex: none;
+}
+.admin-main .section-toolbar {
+  row-gap: 12px;
+  flex-wrap: wrap;
+}
+.admin-main .schedule-row > div,
+.admin-main .staff-card-top > div {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 760px) {
+  .admin-main {
+    scrollbar-gutter: auto;
+  }
+  .admin-main .heading-group {
+    min-width: 0;
+  }
+  .admin-main .filter-toolbar {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  }
+  .admin-main .filter {
+    min-width: 0;
+  }
+  .admin-main .filter select {
+    min-width: 0;
+    min-height: 44px;
+  }
+  .admin-main .freshness {
+    grid-column: 1 / -1;
+  }
+  .admin-main .stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .admin-main .stat-card {
+    padding: 12px;
+    min-height: 123px;
+  }
+  .admin-main .stat-title {
+    gap: 7px;
+  }
+  .admin-main .stat-title h3 {
+    line-height: 1.15;
+  }
+  .admin-main .stat-values {
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+  .admin-main .stat-values > strong {
+    font-size: 24px;
+  }
+  .admin-main .small-ring {
+    width: 38px;
+    height: 38px;
+  }
+  .admin-main .overall-content {
+    gap: 13px;
+  }
+  .admin-main .large-ring {
+    width: 108px;
+    height: 108px;
+  }
+  .admin-main .large-ring > div {
+    width: 86px;
+    height: 86px;
+  }
+  .admin-main .schedule-row {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+  }
+  .admin-main .schedule-row :is(.status-enabled, .status-void) {
+    display: inline-block;
+    grid-column: 2;
+    justify-self: start;
+    grid-row: 2;
+  }
+  .admin-main .schedule-row .text-button {
+    grid-column: 3;
+    grid-row: 1 / 3;
+    min-height: 44px;
+  }
+  .admin-main :is(.teams-table, .history-table),
+  .admin-main :is(.teams-table, .history-table) tbody {
+    display: block;
+    white-space: normal;
+  }
+  .admin-main :is(.teams-table, .history-table) thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+  .admin-main :is(.teams-table, .history-table) tbody tr {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: start;
+    gap: 10px 12px;
+    margin-bottom: 10px;
+    padding: 13px;
+    border: 1px solid var(--admin-line);
+    border-radius: 13px;
+    background: #f9fbfc;
+  }
+  .admin-main :is(.teams-table, .history-table) tbody td {
+    min-width: 0;
+    padding: 0;
+    border: 0;
+  }
+  .admin-main :is(.teams-table, .history-table) td[data-label]::before {
+    content: attr(data-label);
+    display: block;
+    margin-bottom: 4px;
+    color: #526b78;
+    font-size: 10px;
+    font-weight: 700;
+  }
+  .admin-main .record-code,
+  .admin-main .record-name,
+  .admin-main .record-progress,
+  .admin-main .record-actions {
+    grid-column: 1 / -1;
+  }
+  .admin-main .record-name {
+    font-size: 15px;
+    font-weight: 750;
+  }
+  .admin-main .record-actions:not(:empty) {
+    border-top: 1px solid var(--admin-line);
+    padding-top: 5px;
+  }
+  .admin-main .record-actions .text-button {
+    min-height: 44px;
+    padding: 0 8px;
+  }
+}
