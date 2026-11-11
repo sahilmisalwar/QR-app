@@ -423,18 +423,22 @@ details p {
 }
 .masthead-accent {
   position: absolute;
-  inset: 0 auto 0 0;
-  width: var(--sidebar-width);
-  height: 100%;
+  left: -90px;
+  top: -60px;
+  width: 290px;
+  height: 220px;
   background:
     repeating-linear-gradient(
-      125deg,
-      transparent 0 51px,
-      #0b839344 52px 53px,
-      transparent 54px 91px
+      90deg,
+      transparent 0 49px,
+      #06adba55 50px 51px,
+      transparent 52px 89px
     ),
-    linear-gradient(155deg, #063b47 0%, #00343e 55%, #092f40 100%);
-  border-right: 1px solid #9ccdd02b;
+    linear-gradient(110deg, #002a32, #075565);
+  transform: skewX(-38deg);
+  box-shadow:
+    15px 0 #d6a54222,
+    27px 0 #eb9d2033;
 }
 .masthead-end {
   position: absolute;
@@ -457,7 +461,7 @@ details p {
   z-index: 30;
   display: flex;
   flex-direction: column;
-  border-radius: 0;
+  border-radius: 0 22px 0 0;
   overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior: contain;
