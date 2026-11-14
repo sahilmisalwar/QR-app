@@ -379,10 +379,9 @@ details p {
   place-items: center;
   grid-template: minmax(0, 1fr) / minmax(0, 1fr);
   background:
-    radial-gradient(ellipse at 15% 110%, #14777d95, transparent 55%),
-    radial-gradient(ellipse at 90% 0%, #54469d80, transparent 52%),
-    #101e37;
-  border-bottom: 1px solid #437d8d;
+    radial-gradient(ellipse at 50% 115%, #edfaff75, transparent 70%),
+    linear-gradient(105deg, #7294ae, #bdcfdc 30%, #c7d2e5 69%, #868db7);
+  border-bottom: 1px solid #34617c55;
   overflow: hidden;
   z-index: 20;
 }
@@ -421,14 +420,15 @@ details p {
   margin: 0 auto;
   padding: 0 clamp(6px, 3vw, 38px);
   gap: clamp(4px, 2vw, 26px);
-  border: 1px solid #fff9;
-  border-radius: 20px;
-  background: linear-gradient(110deg, #fff9ef, #f8fcfc 52%, #efefff);
-  box-shadow: 0 5px 18px #070e2670;
 }
 .masthead .brand-lockup img {
   min-width: 0;
   max-height: calc(100% - 4px);
+  filter: drop-shadow(0 1px 2px #ffffff90);
+}
+.masthead .brand-lockup > span {
+  flex: 0 0 1px;
+  background: linear-gradient(transparent, #3b58705c, transparent);
 }
 .sidebar {
   position: relative;
