@@ -458,11 +458,6 @@ export function Admin({ gateway, user, snapshot, refresh, onLogout }: Props) {
         Skip to main content
       </a>
       <header className="masthead">
-        <div className="masthead-petals" aria-hidden="true">
-          {Array.from({ length: 8 }, (_, index) => (
-            <span key={index} />
-          ))}
-        </div>
         <Brand />
       </header>
       {mobileMenu && (

@@ -409,47 +409,6 @@ details p {
     transform: translate(22%, -10%) rotate(-7deg);
   }
 }
-.masthead-petals {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  display: grid;
-  grid-template-columns: repeat(8, minmax(0, 1fr));
-  place-items: center;
-  pointer-events: none;
-}
-.masthead-petals > span {
-  --petal-turn: -36deg;
-  width: clamp(6px, 0.95vw, 14px);
-  aspect-ratio: 2 / 1;
-  border-radius: 86% 14% 83% 17% / 78% 22% 78% 22%;
-  background: #f0a32b;
-  transform: translateY(-17px) rotate(var(--petal-turn));
-  animation: masthead-petal-float 7s ease-in-out infinite alternate;
-}
-.masthead-petals > span:nth-child(even) {
-  --petal-turn: 24deg;
-  animation-delay: -3s;
-  animation-duration: 9s;
-}
-.masthead-petals > span:nth-child(3n) {
-  --petal-turn: 58deg;
-  width: clamp(5px, 0.7vw, 10px);
-  animation-delay: -5s;
-}
-@keyframes masthead-petal-float {
-  from {
-    transform: translate(-9px, -21px) rotate(var(--petal-turn));
-  }
-  to {
-    transform: translate(12px, 21px) rotate(calc(var(--petal-turn) + 65deg));
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .masthead-petals > span:nth-child(even) {
-    transform: translateY(17px) rotate(var(--petal-turn));
-  }
-}
 .brand-lockup {
   height: 100%;
   display: flex;
