@@ -375,8 +375,14 @@ details p {
   height: var(--masthead-height);
   grid-column: 1 / -1;
   position: relative;
-  background: #ffffff59;
-  border-bottom: 1px solid #17525e24;
+  display: grid;
+  place-items: center;
+  grid-template: minmax(0, 1fr) / minmax(0, 1fr);
+  background:
+    radial-gradient(ellipse at 15% 110%, #14777d95, transparent 55%),
+    radial-gradient(ellipse at 90% 0%, #54469d80, transparent 52%),
+    #101e37;
+  border-bottom: 1px solid #437d8d;
   overflow: hidden;
   z-index: 20;
 }
@@ -410,9 +416,19 @@ details p {
   background: linear-gradient(transparent, #becdcd, transparent);
 }
 .masthead .brand-lockup {
-  margin-left: 220px;
-  max-width: 1090px;
-  padding: 5px 65px;
+  width: min(780px, calc(100% - 24px));
+  height: calc(100% - 14px);
+  margin: 0 auto;
+  padding: 0 clamp(6px, 3vw, 38px);
+  gap: clamp(4px, 2vw, 26px);
+  border: 1px solid #fff9;
+  border-radius: 20px;
+  background: linear-gradient(110deg, #fff9ef, #f8fcfc 52%, #efefff);
+  box-shadow: 0 5px 18px #070e2670;
+}
+.masthead .brand-lockup img {
+  min-width: 0;
+  max-height: calc(100% - 4px);
 }
 .sidebar {
   position: relative;
@@ -1826,9 +1842,6 @@ details p {
   .admin-main {
     padding: 23px 22px;
   }
-  .masthead .brand-lockup {
-    margin-left: 202px;
-  }
   .filter-toolbar {
     gap: 12px;
     flex-wrap: wrap;
@@ -1978,11 +1991,6 @@ details p {
   .admin-app {
     --masthead-height: 87px;
     grid-template-columns: minmax(0, 1fr);
-  }
-  .masthead .brand-lockup {
-    margin: 0;
-    padding: 3px clamp(10px, 4vw, 25px);
-    gap: clamp(6px, 2vw, 12px);
   }
   .brand-lockup img {
     width: 100px;
