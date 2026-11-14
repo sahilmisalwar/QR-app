@@ -378,31 +378,34 @@ details p {
   display: grid;
   place-items: center;
   grid-template: minmax(0, 1fr) / minmax(0, 1fr);
-  background:
-    radial-gradient(ellipse at 36% 0, #fffdf6, transparent 70%),
-    linear-gradient(110deg, #e8d7ba, #f4ebdb 35%, #e8e5dc 72%);
-  border-bottom: 1px solid #c5ae7d;
+  background: #c6eff6;
+  border-bottom: 1px solid #68afbd80;
   overflow: hidden;
   z-index: 20;
 }
 .masthead::before {
   content: "";
   position: absolute;
-  inset: 0 0 0 auto;
-  width: 33.333%;
-  background:
-    radial-gradient(ellipse at 90% 10%, #14737e65, transparent 75%),
-    linear-gradient(115deg, #14283b, #071b2c);
-  clip-path: polygon(30px 0, 100% 0, 100% 100%, 0 100%);
+  inset: 0 -20%;
+  background: linear-gradient(
+    108deg,
+    #8de5f4,
+    #c5f6e8 27%,
+    #fff0ae 51%,
+    #ffd9e7 73%,
+    #b5ccff
+  );
+  animation: masthead-drift 22s ease-in-out infinite alternate;
   pointer-events: none;
 }
-.masthead::after {
-  content: "";
-  position: absolute;
-  inset: auto 0 0;
-  height: 2px;
-  background: linear-gradient(90deg, #bc974b, #ead5a2 45%, #26a4ab 80%, #1c667f);
-  pointer-events: none;
+@keyframes masthead-drift {
+  from { transform: translateX(-11%); }
+  to { transform: translateX(11%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .masthead::before {
+    animation: none;
+  }
 }
 .brand-lockup {
   height: 100%;
@@ -449,10 +452,7 @@ details p {
   max-height: calc(100% - 2px);
 }
 .masthead .brand-lockup > span {
-  background: linear-gradient(transparent, #9c89585c, transparent);
-}
-.masthead .brand-lockup > span:last-of-type {
-  visibility: hidden;
+  background: linear-gradient(transparent, #31527950, transparent);
 }
 .sidebar {
   position: relative;
