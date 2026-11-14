@@ -378,32 +378,42 @@ details p {
   display: grid;
   place-items: center;
   grid-template: minmax(0, 1fr) / minmax(0, 1fr);
-  background: #c6eff6;
-  border-bottom: 1px solid #68afbd80;
+  background: #fff5e9;
+  border-bottom: 1px solid #e8ad9066;
   overflow: hidden;
   z-index: 20;
 }
-.masthead::before {
+.masthead::before,
+.masthead::after {
   content: "";
   position: absolute;
-  inset: 0 -20%;
-  background: linear-gradient(
-    108deg,
-    #8de5f4,
-    #c5f6e8 27%,
-    #fff0ae 51%,
-    #ffd9e7 73%,
-    #b5ccff
-  );
-  animation: masthead-drift 22s ease-in-out infinite alternate;
+  inset: -95% -30%;
   pointer-events: none;
 }
-@keyframes masthead-drift {
-  from { transform: translateX(-11%); }
-  to { transform: translateX(11%); }
+.masthead::before {
+  background:
+    radial-gradient(ellipse 23% 23% at 43% 50%, #ff984dd9, transparent 100%),
+    radial-gradient(ellipse 24% 20% at 59% 52%, #f7747eb8, transparent 100%);
+  animation: masthead-flow 10s ease-in-out infinite;
+}
+.masthead::after {
+  background: radial-gradient(ellipse 21% 18% at 60% 48%, #ffbb648f, transparent 100%);
+  animation: masthead-flow 10s ease-in-out -5s infinite reverse;
+}
+@keyframes masthead-flow {
+  0%, 100% {
+    transform: translate(-19%, -10%) rotate(-11deg);
+  }
+  33% {
+    transform: translate(12%, 11%) rotate(8deg);
+  }
+  67% {
+    transform: translate(22%, -10%) rotate(-7deg);
+  }
 }
 @media (prefers-reduced-motion: reduce) {
-  .masthead::before {
+  .masthead::before,
+  .masthead::after {
     animation: none;
   }
 }
