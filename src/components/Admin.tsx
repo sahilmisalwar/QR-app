@@ -458,9 +458,7 @@ export function Admin({ gateway, user, snapshot, refresh, onLogout }: Props) {
         Skip to main content
       </a>
       <header className="masthead">
-        <div className="masthead-accent" />
         <Brand />
-        <div className="masthead-end" />
       </header>
       {mobileMenu && (
         <button
@@ -506,7 +504,6 @@ export function Admin({ gateway, user, snapshot, refresh, onLogout }: Props) {
         </nav>
         <div className="sidebar-event">
           <span className="event-line" />
-          <span className="eyebrow">BUILDING WHAT'S NEXT</span>
           <strong>
             Rising India
             <br />

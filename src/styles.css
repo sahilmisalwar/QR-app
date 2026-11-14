@@ -375,15 +375,8 @@ details p {
   height: var(--masthead-height);
   grid-column: 1 / -1;
   position: relative;
-  background: linear-gradient(
-    115deg,
-    #fff1d9,
-    #fffdfa 40%,
-    #e6f4f2 78%,
-    #f3eafd
-  );
-  border-bottom: 1px solid #e7e6df;
-  box-shadow: 0 4px 12px #4d6c7210;
+  background: #ffffff59;
+  border-bottom: 1px solid #17525e24;
   overflow: hidden;
   z-index: 20;
 }
@@ -421,52 +414,22 @@ details p {
   max-width: 1090px;
   padding: 5px 65px;
 }
-.masthead-accent {
-  position: absolute;
-  left: -90px;
-  top: -60px;
-  width: 290px;
-  height: 220px;
-  background:
-    repeating-linear-gradient(
-      90deg,
-      transparent 0 49px,
-      #06adba55 50px 51px,
-      transparent 52px 89px
-    ),
-    linear-gradient(110deg, #002a32, #075565);
-  transform: skewX(-38deg);
-  box-shadow:
-    15px 0 #d6a54222,
-    27px 0 #eb9d2033;
-}
-.masthead-end {
-  position: absolute;
-  right: -125px;
-  top: -30px;
-  width: 180px;
-  height: 200px;
-  background: #043e49;
-  transform: skewX(-38deg);
-}
 .sidebar {
   position: relative;
   grid-column: 1;
   grid-row: 2;
   min-height: 0;
-  background:
-    radial-gradient(ellipse at 0 85%, #087c8052, transparent 60%),
-    linear-gradient(155deg, #063b47 0%, #00343e 55%, #092f40 100%);
-  color: #e7f3f5;
+  background: linear-gradient(160deg, #e2f2ef, #f5f9fa 62%, #ecf1f7);
+  color: #103642;
+  border-right: 1px solid #17525e24;
   z-index: 30;
   display: flex;
   flex-direction: column;
-  border-radius: 0 22px 0 0;
   overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior: contain;
   scrollbar-width: thin;
-  scrollbar-color: #568e98 transparent;
+  scrollbar-color: #9dbdbf transparent;
   padding: 25px 11px 14px;
 }
 .sidebar > * {
@@ -475,22 +438,6 @@ details p {
 .sidebar-close,
 .sidebar-backdrop {
   display: none;
-}
-.sidebar:before {
-  content: "";
-  position: absolute;
-  inset: 50% -80px 0;
-  background: linear-gradient(
-    135deg,
-    transparent 30%,
-    #12818d16 30%,
-    #0e687828 41%,
-    transparent 41%,
-    transparent 63%,
-    #cb8f2b17 63%,
-    #147b8a11 64%
-  );
-  pointer-events: none;
 }
 .sidebar-title {
   padding: 3px 18px 25px;
@@ -503,10 +450,10 @@ details p {
   letter-spacing: -0.025em;
 }
 .sidebar-title strong span {
-  color: #e6eff0;
+  color: #103642;
 }
 .sidebar-title small {
-  color: #a6c6cd;
+  color: #496770;
   font-size: 12px;
 }
 .sidebar nav {
@@ -522,7 +469,7 @@ details p {
   width: 100%;
   background: transparent;
   border: 1px solid transparent;
-  color: #deecee;
+  color: #264b57;
   border-radius: 10px;
   padding: 13px 14px;
   font-size: 12px;
@@ -530,15 +477,13 @@ details p {
   transition: 0.15s;
 }
 .sidebar nav button:hover {
-  background: #ffffff0d;
+  background: #d6eae8;
 }
 .sidebar nav button.active {
-  background: linear-gradient(110deg, #f3b245, #bd750b);
-  border: 1px solid #ffd17c;
-  box-shadow:
-    0 4px 14px #001e3533,
-    inset 0 1px #fff8;
-  color: #fff;
+  background: linear-gradient(110deg, #cae9e4, #e3f1ee);
+  border-color: #9cc9c4;
+  box-shadow: inset 3px 0 #167781;
+  color: #074952;
 }
 .sidebar-event {
   position: relative;
@@ -549,7 +494,7 @@ details p {
 }
 .sidebar-event .eyebrow {
   font-size: 8px;
-  color: #90b8bd;
+  color: #496770;
 }
 .sidebar-event strong {
   font-size: 18px;
@@ -559,14 +504,14 @@ details p {
 }
 .sidebar-event small {
   font-size: 10px;
-  color: #a1c1c9;
+  color: #496770;
 }
 .sidebar-event > div {
   font-size: 10px;
   display: flex;
   align-items: center;
   gap: 7px;
-  color: #c5dbde;
+  color: #395b64;
 }
 .event-line {
   height: 1px;
@@ -581,9 +526,9 @@ details p {
   margin: 0 14px;
   padding: 11px 0;
   border: 0;
-  border-top: 1px solid #ffffff15;
+  border-top: 1px solid #17525e24;
   background: transparent;
-  color: #a1c1c9;
+  color: #496770;
   font-size: 11px;
 }
 .admin-main {
@@ -2036,8 +1981,8 @@ details p {
   }
   .masthead .brand-lockup {
     margin: 0;
-    padding: 3px 25px;
-    gap: 12px;
+    padding: 3px clamp(10px, 4vw, 25px);
+    gap: clamp(6px, 2vw, 12px);
   }
   .brand-lockup img {
     width: 100px;
@@ -2053,12 +1998,6 @@ details p {
   }
   .brand-lockup > span {
     height: 29px;
-  }
-  .masthead-accent {
-    opacity: 0.15;
-  }
-  .masthead-end {
-    opacity: 0.15;
   }
   .sidebar {
     position: absolute;
@@ -2084,10 +2023,10 @@ details p {
     right: 9px;
     width: 36px;
     height: 36px;
-    border: 1px solid #ffffff30;
+    border: 1px solid #abcac8;
     border-radius: 9px;
-    background: #ffffff10;
-    color: white;
+    background: #f5faf9;
+    color: #103642;
   }
   .sidebar-backdrop {
     display: block;

@@ -1,10 +1,13 @@
-.admin-main {
-  --admin-line: #e0e8ec;
-  --admin-panel-shadow: 0 2px 4px #112c3a06, 0 12px 28px #203f5110;
+.admin-app {
   background:
     radial-gradient(ellipse at 5% 0, #d5efea, transparent 45%),
     radial-gradient(ellipse at 98% 4%, #fff0db, transparent 43%),
     linear-gradient(150deg, #f4f8f9, #f4f3fb);
+}
+.admin-main {
+  --admin-line: #e0e8ec;
+  --admin-panel-shadow: 0 2px 4px #112c3a06, 0 12px 28px #203f5110;
+  background: transparent;
 }
 .admin-main .panel {
   background: #fff;
