@@ -1617,6 +1617,23 @@ details p {
     radial-gradient(ellipse at 70% 100%, #d4c1f880, transparent 55%),
     linear-gradient(135deg, #f1faf7, #fff8ee 55%, #f2effb);
 }
+@media (prefers-reduced-motion: no-preference) {
+  .login-page:not(.account-page) {
+    background-size: 130% 125%, 135% 130%, 125% 140%, 115% 115%;
+    animation: login-gradient-flow 12s ease-in-out infinite;
+  }
+}
+@keyframes login-gradient-flow {
+  0%, 100% {
+    background-position: 50% 50%, 50% 50%, 50% 50%, 50% 50%;
+  }
+  33% {
+    background-position: 0% 20%, 100% 80%, 85% 100%, 0% 70%;
+  }
+  67% {
+    background-position: 100% 70%, 5% 0%, 15% 35%, 100% 30%;
+  }
+}
 .login-top {
   height: 120px;
   border-bottom: 1px solid #dee7e8;
