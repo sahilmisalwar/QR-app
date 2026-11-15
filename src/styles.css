@@ -1617,21 +1617,28 @@ details p {
     radial-gradient(ellipse at 70% 100%, #d4c1f880, transparent 55%),
     linear-gradient(135deg, #f1faf7, #fff8ee 55%, #f2effb);
 }
+.login-page:not(.account-page) {
+  background:
+    radial-gradient(ellipse at 32% 37%, #70d9c3b3, transparent 50%),
+    radial-gradient(ellipse at 68% 35%, #ffbc78ad, transparent 48%),
+    radial-gradient(ellipse at 52% 72%, #b79beed1, transparent 55%),
+    linear-gradient(135deg, #f1faf7, #fff8ee 55%, #f2effb);
+}
 @media (prefers-reduced-motion: no-preference) {
   .login-page:not(.account-page) {
-    background-size: 130% 125%, 135% 130%, 125% 140%, 115% 115%;
-    animation: login-gradient-flow 12s ease-in-out infinite;
+    background-size: 175% 155%, 165% 160%, 180% 155%, 100% 100%;
+    animation: login-gradient-flow 8s ease-in-out infinite;
   }
 }
 @keyframes login-gradient-flow {
   0%, 100% {
-    background-position: 50% 50%, 50% 50%, 50% 50%, 50% 50%;
+    background-position: 10% 28%, 84% 12%, 70% 86%, center;
   }
   33% {
-    background-position: 0% 20%, 100% 80%, 85% 100%, 0% 70%;
+    background-position: 89% 82%, 18% 62%, 12% 28%, center;
   }
   67% {
-    background-position: 100% 70%, 5% 0%, 15% 35%, 100% 30%;
+    background-position: 57% 14%, 58% 92%, 92% 44%, center;
   }
 }
 .login-top {
@@ -2286,6 +2293,13 @@ details p {
   .login-top {
     height: 90px;
   }
+  .login-top .brand-lockup {
+    gap: clamp(6px, 2vw, 14px);
+    padding-inline: 10px;
+  }
+  .login-top .brand-lockup img {
+    min-width: 0;
+  }
   .login-layout {
     grid-template-columns: 1fr;
     padding: 40px 20px;
@@ -2300,6 +2314,7 @@ details p {
     font-size: 12px;
   }
   .login-checkpoints {
+    flex-wrap: wrap;
     margin: 20px 0;
   }
   .login-note {
