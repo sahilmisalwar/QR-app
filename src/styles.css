@@ -378,8 +378,8 @@ details p {
   display: grid;
   place-items: center;
   grid-template: minmax(0, 1fr) / minmax(0, 1fr);
-  background: #fff5e9;
-  border-bottom: 1px solid #e8ad9066;
+  background: #f1f1f2;
+  border-bottom: 1px solid #cbd0d5;
   overflow: hidden;
   z-index: 20;
 }
@@ -387,26 +387,36 @@ details p {
 .masthead::after {
   content: "";
   position: absolute;
-  inset: -95% -30%;
+  inset: -65% -10%;
   pointer-events: none;
 }
 .masthead::before {
-  background: radial-gradient(ellipse 23% 23% at 43% 50%, #ff984dd9, transparent 100%);
+  background: radial-gradient(
+    ellipse 31% 35% at 50% 49%,
+    #777b828c,
+    #a6a9b075 42%,
+    transparent 100%
+  );
   animation: masthead-flow 10s ease-in-out infinite;
 }
 .masthead::after {
-  background: radial-gradient(ellipse 21% 18% at 60% 48%, #ffbb648f, transparent 100%);
-  animation: masthead-flow 10s ease-in-out -5s infinite reverse;
+  background: radial-gradient(
+    ellipse 23% 15% at 49% 52%,
+    #878b9366,
+    #b1b5bc44 55%,
+    transparent 100%
+  );
+  animation: masthead-flow 10s ease-in-out -3.5s infinite reverse;
 }
 @keyframes masthead-flow {
   0%, 100% {
-    transform: translate(-19%, -10%) rotate(-11deg);
+    transform: translate(-24%, -12%) skewX(30deg) scaleX(0.75);
   }
-  33% {
-    transform: translate(12%, 11%) rotate(8deg);
+  35% {
+    transform: translate(10%, 16%) skewX(47deg) scaleX(1.18);
   }
-  67% {
-    transform: translate(22%, -10%) rotate(-7deg);
+  70% {
+    transform: translate(24%, -7%) skewX(-36deg) scaleX(0.9);
   }
 }
 .brand-lockup {
