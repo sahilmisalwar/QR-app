@@ -96,7 +96,11 @@ function StatCard({
   mode,
   count,
   total,
+  selected,
+  onSelect,
 }: {
+  selected: boolean;
+  onSelect: () => void;
   mode: Mode;
   count: number;
   total: number;
@@ -108,7 +112,16 @@ function StatCard({
         <span className="stat-icon">
           <ModeIcon mode={mode} />
         </span>
-        <h3>{labels[mode]}</h3>
+        <h3>
+          <button
+            className="checkpoint-choice"
+            type="button"
+            aria-pressed={selected}
+            onClick={onSelect}
+          >
+            {labels[mode]}
+          </button>
+        </h3>
       </div>
       <div className="stat-values">
         <strong>
@@ -218,6 +231,7 @@ function HistoryTable({
 export function Admin({ gateway, user, snapshot, refresh, onLogout }: Props) {
   const [page, setPage] = useState<Page>("overview");
   const [day, setDay] = useState(1);
+  const [selectedCheckpoint, setSelectedCheckpoint] = useState<Mode>("lunch");
   const [category, setCategory] = useState("all");
   const [modeFilter, setModeFilter] = useState("all");
   const [query, setQuery] = useState("");
@@ -299,8 +313,7 @@ export function Admin({ gateway, user, snapshot, refresh, onLogout }: Props) {
     }
     if (finished > 0 && finished === enabledModes.length) completedTeams++;
   }
-  const eligible = modes.reduce((sum, m) => sum + totals[m].total, 0);
-  const completed = modes.reduce((sum, m) => sum + totals[m].count, 0);
+  const { total: eligible, count: completed } = totals[selectedCheckpoint];
   const overall = eligible ? Math.round((completed / eligible) * 100) : 0;
   const history = snapshot.claims
     .filter(
@@ -666,19 +679,23 @@ export function Admin({ gateway, user, snapshot, refresh, onLogout }: Props) {
             </section>
             <section className="stats-grid">
               {modes.map((m) => (
-                <StatCard key={m} mode={m} {...totals[m]} />
+                <StatCard
+                  key={m}
+                  mode={m}
+                  {...totals[m]}
+                  selected={selectedCheckpoint === m}
+                  onSelect={() => setSelectedCheckpoint(m)}
+                />
               ))}
               <article className="stat-card remaining">
                 <div className="stat-title">
                   <span className="stat-icon">
                     <Users size={22} />
                   </span>
-                  <h3>Remaining for Lunch</h3>
+                  <h3>Remaining for {labels[selectedCheckpoint]}</h3>
                 </div>
-                <div className="remaining-count">
-                  {totals.lunch.total - totals.lunch.count}
-                </div>
-                <small>of {totals.lunch.total} eligible teams</small>
+                <div className="remaining-count">{eligible - completed}</div>
+                <small>of {eligible} eligible teams</small>
                 <div className="stat-wave" />
               </article>
             </section>
@@ -687,9 +704,9 @@ export function Admin({ gateway, user, snapshot, refresh, onLogout }: Props) {
                 <div className="panel-heading">
                   <h2>
                     <ChartNoAxesCombined />
-                    Overall Progress
+                    {labels[selectedCheckpoint]} Progress
                   </h2>
-                  <small>Team checkpoint actions</small>
+                  <small>Day {day}</small>
                 </div>
                 <div className="overall-content">
                   <div className="large-ring">
@@ -721,7 +738,7 @@ export function Admin({ gateway, user, snapshot, refresh, onLogout }: Props) {
                     <div>
                       <strong>{eligible ? overall + "%" : "—"}</strong>
                       <span>
-                        Overall
+                        {labels[selectedCheckpoint]}
                         <br />
                         completed
                       </span>
@@ -745,7 +762,7 @@ export function Admin({ gateway, user, snapshot, refresh, onLogout }: Props) {
                     <div>
                       <span>
                         <Users />
-                        Eligible actions
+                        Eligible teams
                       </span>
                       <strong>{eligible.toLocaleString()}</strong>
                     </div>
