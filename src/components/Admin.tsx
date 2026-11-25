@@ -1,6 +1,6 @@
 import * as QR from "qrcode";
 import { confirmedMembers, memberCount } from "../lib/attendance";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Home,
   Users,
@@ -23,7 +23,6 @@ import {
   LockKeyhole,
   CalendarDays,
   LogOut,
-  Menu,
   Check,
   X,
   Upload,
@@ -242,48 +241,10 @@ export function Admin({ gateway, user, snapshot, refresh, onLogout }: Props) {
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
-  const [mobileMenu, setMobileMenu] = useState(false);
-  const sidebarRef = useRef<HTMLElement>(null);
-  const menuButtonRef = useRef<HTMLButtonElement>(null);
-
   useEffect(() => {
     window.scrollTo({ top: 0 });
   }, [page]);
 
-  useEffect(() => {
-    if (!mobileMenu) return;
-    const sidebar = sidebarRef.current!;
-    const viewport = window.matchMedia("(max-width: 760px)");
-    const closeOnDesktop = () => {
-      if (!viewport.matches) setMobileMenu(false);
-    };
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        event.preventDefault();
-        setMobileMenu(false);
-      }
-      if (event.key === "Tab") {
-        const buttons = sidebar.querySelectorAll<HTMLButtonElement>("button");
-        const first = buttons[0];
-        const last = buttons[buttons.length - 1];
-        if (event.shiftKey && document.activeElement === first) {
-          event.preventDefault();
-          last.focus();
-        } else if (!event.shiftKey && document.activeElement === last) {
-          event.preventDefault();
-          first.focus();
-        }
-      }
-    };
-    sidebar.querySelector<HTMLButtonElement>(".sidebar-close")?.focus();
-    document.addEventListener("keydown", onKeyDown);
-    viewport.addEventListener("change", closeOnDesktop);
-    return () => {
-      document.removeEventListener("keydown", onKeyDown);
-      viewport.removeEventListener("change", closeOnDesktop);
-      menuButtonRef.current?.focus({ preventScroll: true });
-    };
-  }, [mobileMenu]);
   const [limit, setLimit] = useState(25);
   const [qrImage, setQrImage] = useState("");
   const [rotateReason, setRotateReason] = useState("");
@@ -342,7 +303,6 @@ export function Admin({ gateway, user, snapshot, refresh, onLogout }: Props) {
     setQuery("");
     setModeFilter("all");
     setLimit(25);
-    setMobileMenu(false);
     setError("");
   }
   async function run(action: () => Promise<void>, message?: string) {
@@ -476,39 +436,14 @@ export function Admin({ gateway, user, snapshot, refresh, onLogout }: Props) {
     },
   ];
   return (
-    <div
-      data-page={page}
-      className={`admin-app ${mobileMenu ? "menu-open" : ""}`}
-    >
+    <div data-page={page} className="admin-app">
       <a className="skip-link" href="#main">
         Skip to main content
       </a>
       <header className="masthead">
         <Brand />
       </header>
-      {mobileMenu && (
-        <button
-          className="sidebar-backdrop"
-          aria-label="Dismiss navigation"
-          tabIndex={-1}
-          onClick={() => setMobileMenu(false)}
-        />
-      )}
-      <aside
-        ref={sidebarRef}
-        id="admin-navigation"
-        className={`sidebar ${mobileMenu ? "is-open" : ""}`}
-        role={mobileMenu ? "dialog" : undefined}
-        aria-modal={mobileMenu ? true : undefined}
-        aria-label="Admin navigation"
-      >
-        <button
-          className="sidebar-close"
-          aria-label="Close navigation"
-          onClick={() => setMobileMenu(false)}
-        >
-          <X size={18} />
-        </button>
+      <aside className="sidebar" aria-label="Admin navigation">
         <div className="sidebar-title">
           <strong>
             RIH <span>2.0</span>
@@ -548,20 +483,10 @@ export function Admin({ gateway, user, snapshot, refresh, onLogout }: Props) {
           Sign out
         </button>
       </aside>
-      <main id="main" className="admin-main" inert={mobileMenu}>
+      <main id="main" className="admin-main">
         <div className={page === "overview" ? "overview-hero" : undefined}>
           <div className="page-heading">
             <div className="heading-group">
-              <button
-                className="mobile-menu icon-button"
-                ref={menuButtonRef}
-                aria-label="Toggle navigation"
-                aria-expanded={mobileMenu}
-                aria-controls="admin-navigation"
-                onClick={() => setMobileMenu(!mobileMenu)}
-              >
-                <Menu />
-              </button>
               <span className="heading-marker" />
               <div>
                 <h1>{navigation.find((n) => n.id === page)?.label}</h1>
@@ -1493,11 +1418,7 @@ export function Admin({ gateway, user, snapshot, refresh, onLogout }: Props) {
           <span>Built with care · Powered by Team Nexus</span>
         </footer>
       </main>
-      <nav
-        className="admin-bottom-nav"
-        aria-label="Admin shortcuts"
-        inert={mobileMenu}
-      >
+      <nav className="admin-bottom-nav" aria-label="Admin shortcuts">
         {(
           [
             ["overview", "Overview", Home],

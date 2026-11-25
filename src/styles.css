@@ -489,10 +489,6 @@ details p {
 .sidebar > * {
   flex-shrink: 0;
 }
-.sidebar-close,
-.sidebar-backdrop {
-  display: none;
-}
 .sidebar-title {
   padding: 3px 18px 25px;
   display: grid;
@@ -652,9 +648,6 @@ details p {
   font-size: 15px;
   font-weight: 700;
   box-shadow: 0 2px 6px #10596444;
-}
-.mobile-menu {
-  display: none;
 }
 .filter-toolbar {
   display: flex;
@@ -2067,44 +2060,7 @@ details p {
     height: 29px;
   }
   .sidebar {
-    position: fixed;
-    grid-area: auto;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    visibility: hidden;
-    transform: translateX(-100%);
-    transition: transform 0.2s;
-    width: 228px;
-    box-shadow: 20px 0 30px #00263022;
-  }
-  .sidebar.is-open {
-    visibility: visible;
-    transform: translateX(0);
-  }
-  .sidebar-close {
-    display: grid;
-    place-items: center;
-    position: absolute;
-    top: 12px;
-    right: 9px;
-    width: 36px;
-    height: 36px;
-    border: 1px solid #abcac8;
-    border-radius: 9px;
-    background: #f5faf9;
-    color: #103642;
-  }
-  .sidebar-backdrop {
-    display: block;
-    position: fixed;
-    inset: 0;
-    background: #062c3870;
-    border: 0;
-    z-index: 25;
-  }
-  body:has(.admin-app.menu-open) {
-    overflow: hidden;
+    display: none;
   }
   .admin-main {
     grid-column: 1;
@@ -2130,9 +2086,6 @@ details p {
   }
   .heading-marker {
     display: none;
-  }
-  .mobile-menu {
-    display: flex;
   }
   .profile-control {
     padding: 5px;
