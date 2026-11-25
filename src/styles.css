@@ -353,7 +353,7 @@ details p {
 }
 /* The selected light desktop reference supplies the layout and palette. */
 .admin-workspace {
-  height: 100dvh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
 }
@@ -368,8 +368,7 @@ details p {
   min-height: 0;
   display: grid;
   grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
-  grid-template-rows: var(--masthead-height) minmax(0, 1fr);
-  overflow: hidden;
+  grid-template-rows: var(--masthead-height) 1fr;
 }
 .masthead {
   height: var(--masthead-height);
@@ -467,7 +466,10 @@ details p {
   background: linear-gradient(transparent, #31527950, transparent);
 }
 .sidebar {
-  position: relative;
+  position: sticky;
+  top: 0;
+  align-self: start;
+  height: 100dvh;
   grid-column: 1;
   grid-row: 2;
   min-height: 0;
@@ -588,9 +590,6 @@ details p {
   grid-row: 2;
   min-width: 0;
   min-height: 0;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  scrollbar-gutter: stable;
   padding: 26px 30px 12px;
   background:
     radial-gradient(ellipse at 0 0, #bceae166, transparent 52%),
@@ -2068,9 +2067,9 @@ details p {
     height: 29px;
   }
   .sidebar {
-    position: absolute;
+    position: fixed;
     grid-area: auto;
-    top: var(--masthead-height);
+    top: 0;
     left: 0;
     bottom: 0;
     visibility: hidden;
@@ -2098,13 +2097,13 @@ details p {
   }
   .sidebar-backdrop {
     display: block;
-    position: absolute;
-    inset: var(--masthead-height) 0 0;
+    position: fixed;
+    inset: 0;
     background: #062c3870;
     border: 0;
     z-index: 25;
   }
-  .admin-app.menu-open .admin-main {
+  body:has(.admin-app.menu-open) {
     overflow: hidden;
   }
   .admin-main {
@@ -2112,8 +2111,7 @@ details p {
     padding: 22px 16px;
   }
   .page-heading {
-    position: sticky;
-    top: -22px;
+    position: relative;
     z-index: 12;
     margin: -22px -16px 20px;
     padding: 18px 16px;

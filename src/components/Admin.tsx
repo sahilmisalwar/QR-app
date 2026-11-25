@@ -227,11 +227,10 @@ export function Admin({ gateway, user, snapshot, refresh, onLogout }: Props) {
   const [error, setError] = useState("");
   const [mobileMenu, setMobileMenu] = useState(false);
   const sidebarRef = useRef<HTMLElement>(null);
-  const mainRef = useRef<HTMLElement>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    mainRef.current?.scrollTo({ top: 0 });
+    window.scrollTo({ top: 0 });
   }, [page]);
 
   useEffect(() => {
@@ -522,7 +521,7 @@ export function Admin({ gateway, user, snapshot, refresh, onLogout }: Props) {
           Sign out
         </button>
       </aside>
-      <main ref={mainRef} id="main" className="admin-main" inert={mobileMenu}>
+      <main id="main" className="admin-main" inert={mobileMenu}>
         <div className="page-heading">
           <div className="heading-group">
             <button
