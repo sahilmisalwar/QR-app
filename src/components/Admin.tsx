@@ -82,7 +82,7 @@ const navigation = [
   { id: "settings", label: "Settings", icon: Settings },
 ] as const;
 const descriptions: Record<Page, string> = {
-  overview: "Real-time check-in and event progress",
+  overview: "Team Check-In & Meal Management",
   teams: "Your teams, ready for the big day",
   passes: "One team pass for every checkpoint.",
   history: "Every confirmation, with a clear trail",
@@ -273,25 +273,32 @@ export function Admin({ gateway, user, snapshot, refresh, onLogout }: Props) {
   const teamScope = snapshot.teams.filter(
     (t) => t.active && (category === "all" || t.category === category),
   );
-  const totals = Object.fromEntries(
-    modes.map((mode) => {
-      const schedule = snapshot.schedules.find(
-        (s) => s.day === day && s.mode === mode,
-      );
-      const teams = schedule?.enabled ? teamScope : [];
-      return [
-        mode,
-        {
-          total: teams.length,
-          count: teams.filter(
-            (team) =>
-              confirmedMembers(snapshot.claims, team, day, mode).size ===
-              memberCount(team),
-          ).length,
-        },
-      ];
-    }),
-  ) as Record<Mode, { total: number; count: number }>;
+  const enabledModes = modes.filter((mode) =>
+    snapshot.schedules.some(
+      (schedule) =>
+        schedule.day === day && schedule.mode === mode && schedule.enabled,
+    ),
+  );
+  const totals = {
+    entry: { count: 0, total: 0 },
+    lunch: { count: 0, total: 0 },
+    dinner: { count: 0, total: 0 },
+  };
+  let completedTeams = 0;
+  for (const team of teamScope) {
+    let finished = 0;
+    for (const mode of enabledModes) {
+      totals[mode].total++;
+      if (
+        confirmedMembers(snapshot.claims, team, day, mode).size ===
+        memberCount(team)
+      ) {
+        totals[mode].count++;
+        finished++;
+      }
+    }
+    if (finished > 0 && finished === enabledModes.length) completedTeams++;
+  }
   const eligible = modes.reduce((sum, m) => sum + totals[m].total, 0);
   const completed = modes.reduce((sum, m) => sum + totals[m].count, 0);
   const overall = eligible ? Math.round((completed / eligible) * 100) : 0;
@@ -317,6 +324,7 @@ export function Admin({ gateway, user, snapshot, refresh, onLogout }: Props) {
   function navigate(next: Page) {
     setPage(next);
     setQuery("");
+    setModeFilter("all");
     setLimit(25);
     setMobileMenu(false);
     setError("");
@@ -636,6 +644,26 @@ export function Admin({ gateway, user, snapshot, refresh, onLogout }: Props) {
         )}
         {page === "overview" && (
           <>
+            <section
+              className="team-summary"
+              aria-label="Team completion for the selected day and category"
+            >
+              <div>
+                <Users />
+                <strong>{teamScope.length}</strong>
+                <small>Total teams</small>
+              </div>
+              <div>
+                <ShieldCheck />
+                <strong>{completedTeams}</strong>
+                <small>Completed</small>
+              </div>
+              <div>
+                <Clock3 />
+                <strong>{teamScope.length - completedTeams}</strong>
+                <small>Pending</small>
+              </div>
+            </section>
             <section className="stats-grid">
               {modes.map((m) => (
                 <StatCard key={m} mode={m} {...totals[m]} />
@@ -661,17 +689,35 @@ export function Admin({ gateway, user, snapshot, refresh, onLogout }: Props) {
                     <ChartNoAxesCombined />
                     Overall Progress
                   </h2>
-                  <small>Across all checkpoints</small>
+                  <small>Team checkpoint actions</small>
                 </div>
                 <div className="overall-content">
-                  <div
-                    className="large-ring"
-                    style={
-                      {
-                        "--progress": `${overall * 3.6}deg`,
-                      } as React.CSSProperties
-                    }
-                  >
+                  <div className="large-ring">
+                    <svg viewBox="0 0 100 100" aria-hidden="true">
+                      <circle
+                        cx="50"
+                        cy="50"
+                        r="44"
+                        fill="none"
+                        stroke="#e3edef"
+                        strokeWidth="10"
+                      />
+                      {completed > 0 && (
+                        <circle
+                          cx="50"
+                          cy="50"
+                          r="44"
+                          pathLength="100"
+                          fill="none"
+                          stroke="#008b87"
+                          strokeWidth="10"
+                          strokeLinecap="round"
+                          strokeDasharray="100"
+                          strokeDashoffset={100 - (completed / eligible) * 100}
+                          transform="rotate(-90 50 50)"
+                        />
+                      )}
+                    </svg>
                     <div>
                       <strong>{eligible ? overall + "%" : "—"}</strong>
                       <span>
@@ -727,6 +773,9 @@ export function Admin({ gateway, user, snapshot, refresh, onLogout }: Props) {
                           }}
                         />
                       </div>
+                      <small>
+                        {totals[m].count} / {totals[m].total}
+                      </small>
                       <strong>
                         {totals[m].total
                           ? Math.round(
@@ -738,7 +787,9 @@ export function Admin({ gateway, user, snapshot, refresh, onLogout }: Props) {
                   ))}
                 </div>
                 <p className="panel-note">
-                  A team counts as complete once all its members check in.
+                  A team completes a checkpoint when all members check in.
+                  Completed teams have finished every enabled checkpoint for the
+                  selected day.
                 </p>
               </section>
             </div>
@@ -747,7 +798,7 @@ export function Admin({ gateway, user, snapshot, refresh, onLogout }: Props) {
                 <div className="panel-heading">
                   <h2>
                     <History />
-                    Recent Scanning History
+                    Recent Scanning Activity
                   </h2>
                   <button
                     className="text-button"
@@ -756,7 +807,27 @@ export function Admin({ gateway, user, snapshot, refresh, onLogout }: Props) {
                     View all <ArrowRight size={16} />
                   </button>
                 </div>
-                <HistoryTable claims={history.slice(0, 5)} />
+                <ul className="latest-scans">
+                  {history
+                    .filter((c) => c.status === "confirmed")
+                    .slice(0, 5)
+                    .map((c) => (
+                      <li key={c.id}>
+                        <Users size={17} />
+                        <div>
+                          <strong>{c.teamCode}</strong>
+                          <small>{c.teamName}</small>
+                        </div>
+                        <Badge mode={c.mode} />
+                        <time dateTime={c.at}>{formatTime(c.at)}</time>
+                      </li>
+                    ))}
+                </ul>
+                {!history.some((c) => c.status === "confirmed") && (
+                  <p className="panel-note">
+                    No confirmed scans for this selection.
+                  </p>
+                )}
               </section>
               <section className="panel">
                 <div className="panel-heading">
@@ -1035,6 +1106,24 @@ export function Admin({ gateway, user, snapshot, refresh, onLogout }: Props) {
               </button>
             )}
           </section>
+        )}
+        {(page === "operations" || page === "volunteers") && (
+          <nav className="ops-sections" aria-label="Operations panels">
+            <button
+              aria-current={page === "operations" ? "page" : undefined}
+              onClick={() => navigate("operations")}
+            >
+              <Layers size={17} />
+              Event Operations
+            </button>
+            <button
+              aria-current={page === "volunteers" ? "page" : undefined}
+              onClick={() => navigate("volunteers")}
+            >
+              <UserRound size={17} />
+              Volunteers
+            </button>
+          </nav>
         )}
         {page === "volunteers" && (
           <>
@@ -1375,6 +1464,36 @@ export function Admin({ gateway, user, snapshot, refresh, onLogout }: Props) {
           <span>Built with care · Powered by Team Nexus</span>
         </footer>
       </main>
+      <nav
+        className="admin-bottom-nav"
+        aria-label="Admin shortcuts"
+        inert={mobileMenu}
+      >
+        {(
+          [
+            ["overview", "Overview", Home],
+            ["history", "Scans", History],
+            ["teams", "Teams", Users],
+            ["passes", "QR Passes", QrCode],
+            ["operations", "Ops", Layers],
+            ["reports", "Reports", ChartNoAxesCombined],
+            ["settings", "Settings", Settings],
+          ] as const
+        ).map(([id, label, Icon]) => (
+          <button
+            key={id}
+            aria-current={
+              page === id || (id === "operations" && page === "volunteers")
+                ? "page"
+                : undefined
+            }
+            onClick={() => navigate(id)}
+          >
+            <Icon size={20} />
+            {label}
+          </button>
+        ))}
+      </nav>
       {dialog && (
         <Modal
           title={

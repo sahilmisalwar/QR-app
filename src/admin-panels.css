@@ -248,3 +248,230 @@
     padding: 0 8px;
   }
 }
+
+.team-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  background: white;
+  border: 1px solid #dfe7eb;
+  box-shadow: var(--admin-panel-shadow);
+  border-radius: 16px;
+  padding: 12px 6px;
+  margin-bottom: 14px;
+}
+.team-summary > div {
+  display: grid;
+  grid-template-columns: auto auto;
+  align-content: center;
+  justify-content: center;
+  align-items: center;
+  gap: 0 9px;
+}
+.team-summary > div + div {
+  border-left: 1px solid #dfe8e8;
+}
+.team-summary svg {
+  grid-row: span 2;
+  color: #087d80;
+  background: #e4f5f2;
+  border-radius: 9px;
+  padding: 5px;
+  width: 32px;
+  height: 32px;
+}
+.team-summary > div:nth-child(2) svg {
+  color: #11814c;
+  background: #e7f7eb;
+}
+.team-summary > div:last-child svg {
+  color: #a76100;
+  background: #fff3dd;
+}
+.team-summary strong {
+  font: 700 clamp(20px, 3vw, 28px)/1.1 var(--font-display);
+  font-variant-numeric: tabular-nums;
+}
+.team-summary small,
+.latest-scans small {
+  font-size: 11px;
+  color: #465d68;
+}
+.latest-scans {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.latest-scans li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  font-size: 13px;
+}
+.latest-scans li + li {
+  border-top: 1px solid #edf1f3;
+}
+.latest-scans li > svg {
+  color: #008781;
+}
+.latest-scans small {
+  display: block;
+  overflow-wrap: anywhere;
+}
+.latest-scans time,
+.checkpoint-row small {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  font-size: 11px;
+}
+.admin-bottom-nav {
+  display: none;
+}
+.admin-main .progress-track i {
+  transition: width 0.35s ease;
+}
+.admin-main .quick-actions button:active {
+  transform: scale(0.98);
+}
+.live-badge:not(.stale) .status-dot {
+  animation: live-status-pulse 2.4s ease-out infinite;
+}
+@keyframes live-status-pulse {
+  50% {
+    box-shadow: 0 0 0 4px #24ae751a;
+  }
+}
+@media (max-width: 760px) {
+  .admin-main {
+    padding-bottom: calc(80px + env(safe-area-inset-bottom));
+  }
+  .admin-main .freshness {
+    justify-self: stretch;
+    margin: 0;
+  }
+  .admin-main .freshness .icon-button {
+    margin-left: auto;
+  }
+  .admin-bottom-nav {
+    position: fixed;
+    z-index: 18;
+    inset: auto 0 0;
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    background: #fff;
+    box-shadow: 0 -2px 14px #18384312;
+    border-top: 1px solid #dbe7e8;
+    padding: 4px 6px max(4px, env(safe-area-inset-bottom));
+  }
+  .admin-bottom-nav button {
+    min-height: 52px;
+    padding-inline: 0;
+    font-size: clamp(9px, 2.7vw, 11px);
+    white-space: nowrap;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 3px;
+    border: 0;
+    background: transparent;
+    color: #516570;
+  }
+  .admin-bottom-nav [aria-current] {
+    color: #006a6b;
+    font-weight: 700;
+    box-shadow: inset 0 -3px #008781;
+  }
+  .admin-main .quick-actions button {
+    flex-direction: row;
+    min-height: 58px;
+    gap: 8px;
+  }
+  .admin-main .checkpoint-row {
+    gap: 7px;
+  }
+  .admin-main .checkpoint-row > span {
+    min-width: 65px;
+    gap: 5px;
+  }
+  .team-summary svg {
+    width: 24px;
+    height: 24px;
+    padding: 3px;
+  }
+  .team-summary > div {
+    column-gap: 4px;
+  }
+}
+@media (min-width: 600px) and (max-width: 760px) {
+  .admin-main .stats-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.admin-main .large-ring {
+  position: relative;
+  background: none;
+  box-shadow: none;
+}
+.large-ring > svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.large-ring circle {
+  transition: stroke-dashoffset 0.45s ease;
+}
+@starting-style {
+  .large-ring circle[pathLength] {
+    stroke-dashoffset: 100;
+  }
+}
+@property --progress {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+.small-ring {
+  transition: --progress 0.45s ease;
+}
+@starting-style {
+  .small-ring {
+    --progress: 0deg !important;
+  }
+}
+@media (min-width: 761px) and (max-width: 1000px) {
+  .admin-main .stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.ops-sections {
+  display: flex;
+  gap: 4px;
+  width: fit-content;
+  max-width: 100%;
+  background: white;
+  border: 1px solid #d7e5e6;
+  border-radius: 14px;
+  padding: 4px;
+  margin-bottom: 14px;
+}
+.ops-sections button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: #3b535a;
+  padding: 0 10px;
+  font-size: 13px;
+}
+.ops-sections [aria-current] {
+  background: #d9eeeb;
+  color: #055b5b;
+  font-weight: 700;
+}
