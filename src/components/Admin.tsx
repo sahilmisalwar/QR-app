@@ -135,6 +135,9 @@ function StatCard({
           <b>{total ? `${percent}%` : "—"}</b>
         </div>
       </div>
+      {selected && (
+        <Check className="checkpoint-selected" size={15} aria-hidden="true" />
+      )}
       <div className="stat-wave" />
     </article>
   );
@@ -473,7 +476,10 @@ export function Admin({ gateway, user, snapshot, refresh, onLogout }: Props) {
     },
   ];
   return (
-    <div className={`admin-app ${mobileMenu ? "menu-open" : ""}`}>
+    <div
+      data-page={page}
+      className={`admin-app ${mobileMenu ? "menu-open" : ""}`}
+    >
       <a className="skip-link" href="#main">
         Skip to main content
       </a>
@@ -543,84 +549,108 @@ export function Admin({ gateway, user, snapshot, refresh, onLogout }: Props) {
         </button>
       </aside>
       <main id="main" className="admin-main" inert={mobileMenu}>
-        <div className="page-heading">
-          <div className="heading-group">
+        <div className={page === "overview" ? "overview-hero" : undefined}>
+          <div className="page-heading">
+            <div className="heading-group">
+              <button
+                className="mobile-menu icon-button"
+                ref={menuButtonRef}
+                aria-label="Toggle navigation"
+                aria-expanded={mobileMenu}
+                aria-controls="admin-navigation"
+                onClick={() => setMobileMenu(!mobileMenu)}
+              >
+                <Menu />
+              </button>
+              <span className="heading-marker" />
+              <div>
+                <h1>{navigation.find((n) => n.id === page)?.label}</h1>
+                <p>{descriptions[page]}</p>
+              </div>
+            </div>
             <button
-              className="mobile-menu icon-button"
-              ref={menuButtonRef}
-              aria-label="Toggle navigation"
-              aria-expanded={mobileMenu}
-              aria-controls="admin-navigation"
-              onClick={() => setMobileMenu(!mobileMenu)}
+              className="profile-control"
+              onClick={() => setDialog({ type: "help" })}
             >
-              <Menu />
+              <span className="avatar">{user.name[0]}</span>
+              <span>
+                <strong>{user.name}</strong>
+                <small>Event administrator</small>
+              </span>
+              <ChevronDown size={17} />
             </button>
-            <span className="heading-marker" />
-            <div>
-              <h1>{navigation.find((n) => n.id === page)?.label}</h1>
-              <p>{descriptions[page]}</p>
+          </div>
+          <div className="filter-toolbar">
+            <div className="filter">
+              <CalendarDays size={19} />
+              <label htmlFor="event-day">Event Day</label>
+              <select
+                id="event-day"
+                value={day}
+                onChange={(e) => setDay(Number(e.target.value))}
+              >
+                <option value={1}>Day 1</option>
+                <option value={2}>Day 2</option>
+              </select>
+            </div>
+            <div className="filter">
+              <Users size={19} />
+              <label htmlFor="team-category">Team Category</label>
+              <select
+                id="team-category"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+              >
+                <option value="all">All Categories (A + B + C)</option>
+                {Object.entries(categories).map(([key, name]) => (
+                  <option key={key} value={key}>
+                    {key} · {name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="freshness">
+              <span className={`live-badge ${recent ? "" : "stale"}`}>
+                <span className="status-dot" />
+                {gateway.kind === "demo"
+                  ? "Local demo"
+                  : recent
+                    ? "Live"
+                    : "Reconnecting"}
+              </span>
+              <small>Updated {formatTime(snapshot.serverTime)}</small>
+              <button
+                className="icon-button"
+                aria-label="Refresh dashboard"
+                disabled={busy}
+                onClick={() => void run(refresh)}
+              >
+                <RefreshCw size={19} className={busy ? "spin" : ""} />
+              </button>
             </div>
           </div>
-          <button
-            className="profile-control"
-            onClick={() => setDialog({ type: "help" })}
-          >
-            <span className="avatar">{user.name[0]}</span>
-            <span>
-              <strong>{user.name}</strong>
-              <small>Event administrator</small>
-            </span>
-            <ChevronDown size={17} />
-          </button>
-        </div>
-        <div className="filter-toolbar">
-          <div className="filter">
-            <CalendarDays size={19} />
-            <label htmlFor="event-day">Event Day</label>
-            <select
-              id="event-day"
-              value={day}
-              onChange={(e) => setDay(Number(e.target.value))}
+          {page === "overview" && (
+            <section
+              className="team-summary"
+              aria-label="Team completion for the selected day and category"
             >
-              <option value={1}>Day 1</option>
-              <option value={2}>Day 2</option>
-            </select>
-          </div>
-          <div className="filter">
-            <Users size={19} />
-            <label htmlFor="team-category">Team Category</label>
-            <select
-              id="team-category"
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-            >
-              <option value="all">All Categories (A + B + C)</option>
-              {Object.entries(categories).map(([key, name]) => (
-                <option key={key} value={key}>
-                  {key} · {name}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="freshness">
-            <span className={`live-badge ${recent ? "" : "stale"}`}>
-              <span className="status-dot" />
-              {gateway.kind === "demo"
-                ? "Local demo"
-                : recent
-                  ? "Live"
-                  : "Reconnecting"}
-            </span>
-            <small>Updated {formatTime(snapshot.serverTime)}</small>
-            <button
-              className="icon-button"
-              aria-label="Refresh dashboard"
-              disabled={busy}
-              onClick={() => void run(refresh)}
-            >
-              <RefreshCw size={19} className={busy ? "spin" : ""} />
-            </button>
-          </div>
+              <div>
+                <Users />
+                <strong>{teamScope.length}</strong>
+                <small>Total teams</small>
+              </div>
+              <div>
+                <ShieldCheck />
+                <strong>{completedTeams}</strong>
+                <small>Completed</small>
+              </div>
+              <div>
+                <Clock3 />
+                <strong>{teamScope.length - completedTeams}</strong>
+                <small>Pending</small>
+              </div>
+            </section>
+          )}
         </div>
         {gateway.kind === "demo" && (
           <div className="demo-notice">
@@ -657,27 +687,7 @@ export function Admin({ gateway, user, snapshot, refresh, onLogout }: Props) {
         )}
         {page === "overview" && (
           <>
-            <section
-              className="team-summary"
-              aria-label="Team completion for the selected day and category"
-            >
-              <div>
-                <Users />
-                <strong>{teamScope.length}</strong>
-                <small>Total teams</small>
-              </div>
-              <div>
-                <ShieldCheck />
-                <strong>{completedTeams}</strong>
-                <small>Completed</small>
-              </div>
-              <div>
-                <Clock3 />
-                <strong>{teamScope.length - completedTeams}</strong>
-                <small>Pending</small>
-              </div>
-            </section>
-            <section className="stats-grid">
+            <section className="stats-grid" aria-label="Select a checkpoint">
               {modes.map((m) => (
                 <StatCard
                   key={m}
@@ -700,7 +710,9 @@ export function Admin({ gateway, user, snapshot, refresh, onLogout }: Props) {
               </article>
             </section>
             <div className="progress-grid">
-              <section className="panel">
+              <section
+                className={`panel checkpoint-detail ${selectedCheckpoint}`}
+              >
                 <div className="panel-heading">
                   <h2>
                     <ChartNoAxesCombined />
