@@ -1,3 +1,4 @@
+import { BrandHeader } from "./shared";
 import { confirmedMembers, memberCount } from "../lib/attendance";
 import { randomId } from "../lib/id";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -366,18 +367,6 @@ export function Volunteer({
     setScreen("scan");
   };
 
-  const brand = (
-    <div
-      className="v-brand"
-      aria-label="Rising India Hackathon, Nagpur Institute of Technology and Team Nexus"
-    >
-      <img src="/brand/rising-india.png" alt="Rising India Hackathon 2.0" />
-      <span />
-      <img src="/brand/nit.png" alt="Nagpur Institute of Technology" />
-      <span />
-      <img src="/brand/nexus.png" alt="Team Nexus" />
-    </div>
-  );
   const status = (
     <span className={`v-connection ${healthy ? "" : "v-connection-off"}`}>
       <span />
@@ -407,7 +396,7 @@ export function Volunteer({
             LOCAL DEMO <span>Sample teams · day {user.day}</span>
           </div>
         )}
-        {brand}
+        <BrandHeader />
         {screen === "home" ? (
           <>
             <main className="v-main">

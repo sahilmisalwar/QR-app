@@ -4,7 +4,7 @@ import type { Gateway, Staff, Snapshot, Mode, Role } from "./lib/types";
 import { AppError, labels, modes } from "./lib/types";
 import { createDemoGateway } from "./lib/demo";
 import { createSupabaseGateway } from "./lib/supabase";
-import { Brand, ModeIcon } from "./components/shared";
+import { BrandHeader, ModeIcon } from "./components/shared";
 import { Admin } from "./components/Admin";
 import { Volunteer } from "./components/Volunteer";
 import { AdminVerification, PasswordSetup } from "./components/Account";
@@ -32,12 +32,15 @@ try {
 export function App() {
   if (!configuredGateway)
     return (
-      <div className="loading">
-        <ShieldCheck size={36} />
-        <h1>Complete the event connection</h1>
-        <p>{configurationError}</p>
-        <p>Configuration instructions are in the project README.</p>
-      </div>
+      <>
+        <BrandHeader />
+        <div className="loading">
+          <ShieldCheck size={36} />
+          <h1>Complete the event connection</h1>
+          <p>{configurationError}</p>
+          <p>Configuration instructions are in the project README.</p>
+        </div>
+      </>
     );
   return <Workspace gateway={configuredGateway} />;
 }
@@ -169,10 +172,13 @@ function Workspace({ gateway }: { gateway: Gateway }) {
   }
   if (loading)
     return (
-      <div className="loading">
-        <LoaderCircle className="spin" />
-        Opening event operations…
-      </div>
+      <>
+        <BrandHeader />
+        <div className="loading">
+          <LoaderCircle className="spin" />
+          Opening event operations…
+        </div>
+      </>
     );
   if (needsVerification && gateway.account)
     return (
@@ -201,9 +207,7 @@ function Workspace({ gateway }: { gateway: Gateway }) {
   if (!user)
     return (
       <div className="login-page">
-        <div className="login-top">
-          <Brand />
-        </div>
+        <BrandHeader />
         <div className="login-layout">
           <section className="login-intro">
             <span className="eyebrow">RISING INDIA HACKATHON 2.0</span>
@@ -365,13 +369,16 @@ function Workspace({ gateway }: { gateway: Gateway }) {
     );
   if (!data)
     return (
-      <div className="loading">
-        <LoaderCircle className="spin" />
-        <p>{error || "Loading your workspace…"}</p>
-        <button className="button" onClick={() => void logout()}>
-          Back to sign in
-        </button>
-      </div>
+      <>
+        <BrandHeader />
+        <div className="loading">
+          <LoaderCircle className="spin" />
+          <p>{error || "Loading your workspace…"}</p>
+          <button className="button" onClick={() => void logout()}>
+            Back to sign in
+          </button>
+        </div>
+      </>
     );
   return (
     <div className={user.role === "admin" ? "admin-workspace" : undefined}>

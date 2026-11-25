@@ -1,4 +1,12 @@
 :root {
+  --masthead-height: 108px;
+}
+@media (max-width: 760px) {
+  :root {
+    --masthead-height: 87px;
+  }
+}
+:root {
   --font-body: "Plus Jakarta Sans Variable", sans-serif;
   --font-display: "Outfit Variable", sans-serif;
   font-family: var(--font-body);
@@ -264,7 +272,7 @@ details p {
   top: 0;
 }
 .loading {
-  min-height: 100vh;
+  min-height: calc(100dvh - var(--masthead-height));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -361,7 +369,6 @@ details p {
   flex-shrink: 0;
 }
 .admin-app {
-  --masthead-height: 108px;
   --sidebar-width: 228px;
   position: relative;
   flex: 1;
@@ -377,46 +384,10 @@ details p {
   display: grid;
   place-items: center;
   grid-template: minmax(0, 1fr) / minmax(0, 1fr);
-  background: #f1f1f2;
-  border-bottom: 1px solid #cbd0d5;
+  background: linear-gradient(105deg, #eef4f0, #fffcf4 50%, #ecf3f1);
+  border-bottom: 1px solid #cddbd5;
   overflow: hidden;
   z-index: 20;
-}
-.masthead::before,
-.masthead::after {
-  content: "";
-  position: absolute;
-  inset: -65% -10%;
-  pointer-events: none;
-}
-.masthead::before {
-  background: radial-gradient(
-    ellipse 31% 35% at 50% 49%,
-    #777b828c,
-    #a6a9b075 42%,
-    transparent 100%
-  );
-  animation: masthead-flow 10s ease-in-out infinite;
-}
-.masthead::after {
-  background: radial-gradient(
-    ellipse 23% 15% at 49% 52%,
-    #878b9366,
-    #b1b5bc44 55%,
-    transparent 100%
-  );
-  animation: masthead-flow 10s ease-in-out -3.5s infinite reverse;
-}
-@keyframes masthead-flow {
-  0%, 100% {
-    transform: translate(-24%, -12%) skewX(30deg) scaleX(0.75);
-  }
-  35% {
-    transform: translate(10%, 16%) skewX(47deg) scaleX(1.18);
-  }
-  70% {
-    transform: translate(24%, -7%) skewX(-36deg) scaleX(0.9);
-  }
 }
 .brand-lockup {
   height: 100%;
@@ -448,6 +419,7 @@ details p {
   background: linear-gradient(transparent, #becdcd, transparent);
 }
 .masthead .brand-lockup {
+  max-width: 960px;
   display: grid;
   grid-template-columns: minmax(0, 1fr) 1px minmax(0, 1fr) 1px minmax(0, 1fr);
   justify-items: center;
@@ -1618,28 +1590,37 @@ details p {
 }
 @media (prefers-reduced-motion: no-preference) {
   .login-page:not(.account-page) {
-    background-size: 175% 155%, 165% 160%, 180% 155%, 100% 100%;
+    background-size:
+      175% 155%,
+      165% 160%,
+      180% 155%,
+      100% 100%;
     animation: login-gradient-flow 8s ease-in-out infinite;
   }
 }
 @keyframes login-gradient-flow {
-  0%, 100% {
-    background-position: 10% 28%, 84% 12%, 70% 86%, center;
+  0%,
+  100% {
+    background-position:
+      10% 28%,
+      84% 12%,
+      70% 86%,
+      center;
   }
   33% {
-    background-position: 89% 82%, 18% 62%, 12% 28%, center;
+    background-position:
+      89% 82%,
+      18% 62%,
+      12% 28%,
+      center;
   }
   67% {
-    background-position: 57% 14%, 58% 92%, 92% 44%, center;
+    background-position:
+      57% 14%,
+      58% 92%,
+      92% 44%,
+      center;
   }
-}
-.login-top {
-  height: 120px;
-  border-bottom: 1px solid #dee7e8;
-  background: #ffffffa9;
-}
-.login-top .brand-lockup {
-  max-width: 1000px;
 }
 .login-layout {
   max-width: 1170px;
@@ -2041,7 +2022,6 @@ details p {
 }
 @media (max-width: 760px) {
   .admin-app {
-    --masthead-height: 87px;
     grid-template-columns: minmax(0, 1fr);
   }
   .brand-lockup img {
@@ -2240,16 +2220,6 @@ details p {
   }
   .form-grid {
     grid-template-columns: 1fr;
-  }
-  .login-top {
-    height: 90px;
-  }
-  .login-top .brand-lockup {
-    gap: clamp(6px, 2vw, 14px);
-    padding-inline: 10px;
-  }
-  .login-top .brand-lockup img {
-    min-width: 0;
   }
   .login-layout {
     grid-template-columns: 1fr;

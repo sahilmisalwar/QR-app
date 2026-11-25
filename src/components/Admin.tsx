@@ -42,7 +42,7 @@ import type {
   Schedule,
 } from "../lib/types";
 import { modes, labels, categories, formatTime } from "../lib/types";
-import { Brand, ModeIcon, Modal, downloadFile } from "./shared";
+import { BrandHeader, ModeIcon, Modal, downloadFile } from "./shared";
 import { csvCell, parseRoster } from "../lib/csv";
 
 type Page =
@@ -440,9 +440,7 @@ export function Admin({ gateway, user, snapshot, refresh, onLogout }: Props) {
       <a className="skip-link" href="#main">
         Skip to main content
       </a>
-      <header className="masthead">
-        <Brand />
-      </header>
+      <BrandHeader />
       <aside className="sidebar" aria-label="Admin navigation">
         <div className="sidebar-title">
           <strong>

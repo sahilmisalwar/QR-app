@@ -113,46 +113,6 @@
 .v-mode-dinner .v-demo {
   background: #150b28;
 }
-.v-brand {
-  display: grid;
-  grid-template-columns: 1.5fr 1px 1.3fr 1px 1fr;
-  align-items: center;
-  gap: 18px;
-  height: 131px;
-  padding: 24px 27px 18px;
-  position: relative;
-}
-.v-brand:before {
-  content: "";
-  position: absolute;
-  z-index: -1;
-  inset: 0;
-  background: linear-gradient(
-    128deg,
-    transparent 8%,
-    #0ea0bc0e 8.2%,
-    transparent 30%,
-    transparent 70%,
-    #42bcd20b 70.2%,
-    transparent 85%
-  );
-}
-.v-brand img {
-  width: 100%;
-  max-height: 82px;
-  object-fit: contain;
-}
-.v-brand img:last-child {
-  max-height: 73px;
-}
-.v-brand > span {
-  height: 46px;
-  width: 1px;
-  background: #0d445b2b;
-}
-.v-mode-dinner .v-brand > span {
-  background: #cdb7e45c;
-}
 .v-main {
   padding: 10px 23px 17px;
   min-height: 600px;
@@ -1352,11 +1312,6 @@
     position: sticky;
     padding-bottom: max(15px, env(safe-area-inset-bottom));
   }
-  .v-brand {
-    height: 118px;
-    padding-top: 19px;
-    padding-bottom: 15px;
-  }
   .v-main {
     padding-top: 8px;
   }
@@ -1394,11 +1349,6 @@
   .v-flow {
     padding-left: 16px;
     padding-right: 16px;
-  }
-  .v-brand {
-    gap: 13px;
-    padding-left: 22px;
-    padding-right: 22px;
   }
   .v-heading h1 {
     font-size: 26px;

@@ -1,7 +1,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { LoaderCircle, ShieldCheck } from "lucide-react";
 import type { AccountAccess } from "../lib/types";
-import { Brand } from "./shared";
+import { BrandHeader } from "./shared";
 
 export function AccountFrame({
   title,
@@ -12,9 +12,7 @@ export function AccountFrame({
 }) {
   return (
     <div className="login-page account-page">
-      <div className="login-top">
-        <Brand />
-      </div>
+      <BrandHeader />
       <main className="login-card account-card">
         <span className="eyebrow">RISING INDIA · STAFF ACCESS</span>
         <h1>{title}</h1>

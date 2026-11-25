@@ -3,15 +3,17 @@ import type { ReactNode } from "react";
 import { DoorOpen, Utensils, Moon, X } from "lucide-react";
 import type { Mode } from "../lib/types";
 export const modeIcons = { entry: DoorOpen, lunch: Utensils, dinner: Moon };
-export function Brand() {
+export function BrandHeader() {
   return (
-    <div className="brand-lockup">
-      <img src="/brand/rising-india.png" alt="Rising India Hackathon 2.0" />
-      <span />
-      <img src="/brand/nit.png" alt="Nagpur Institute of Technology" />
-      <span />
-      <img src="/brand/nexus.png" alt="Team Nexus" />
-    </div>
+    <header className="masthead">
+      <div className="brand-lockup">
+        <img src="/brand/rising-india.png" alt="Rising India Hackathon 2.0" />
+        <span />
+        <img src="/brand/nit.png" alt="Nagpur Institute of Technology" />
+        <span />
+        <img src="/brand/nexus.png" alt="Team Nexus" />
+      </div>
+    </header>
   );
 }
 export function ModeIcon({ mode, size = 20 }: { mode: Mode; size?: number }) {

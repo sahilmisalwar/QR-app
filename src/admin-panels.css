@@ -507,17 +507,6 @@
 .admin-app[data-page="overview"] {
   background: #f3f6f5;
 }
-[data-page="overview"] .masthead {
-  background: linear-gradient(105deg, #eef4f0, #fffcf4 50%, #ecf3f1);
-  border-bottom: 1px solid #cddbd5;
-}
-[data-page="overview"] .masthead::before,
-[data-page="overview"] .masthead::after {
-  content: none;
-}
-[data-page="overview"] .masthead .brand-lockup {
-  max-width: 960px;
-}
 .overview-hero {
   color: #f7fffb;
   border-radius: 20px;
