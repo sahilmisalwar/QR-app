@@ -937,15 +937,18 @@ export function Volunteer({
               <section
                 className={`v-result v-result-${receipt.code.toLowerCase()}`}
               >
-                <div className="v-result-icon">
-                  {receipt.code === "CONFIRMED" ? (
-                    <Check size={44} />
-                  ) : receipt.code === "VOIDED" ? (
-                    <Info size={44} />
-                  ) : (
-                    <X size={44} />
-                  )}
-                </div>
+                {receipt.code === "CONFIRMED" ? (
+                  <div className="receipt-seal" aria-hidden="true">
+                    <svg viewBox="0 0 96 96" fill="none">
+                      <circle className="receipt-seal-ring" cx="48" cy="48" r="43" pathLength="100" />
+                      <path className="receipt-seal-check" d="m29 49 13 13 26-28" pathLength="100" />
+                    </svg>
+                  </div>
+                ) : (
+                  <div className="v-result-icon" aria-hidden="true">
+                    {receipt.code === "VOIDED" ? <Info size={44} /> : <X size={44} />}
+                  </div>
+                )}
                 <h2>
                   {receipt.code === "CONFIRMED"
                     ? "Check-in Successful!"
