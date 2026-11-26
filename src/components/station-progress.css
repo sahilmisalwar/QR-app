@@ -1,0 +1,117 @@
+.station-heading.v-heading {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin: 7px 0 16px;
+}
+.station-heading.v-heading p {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 5px;
+  color: var(--v-accent-dark);
+  font: 750 .665rem/1.3 var(--font-body);
+  text-transform: uppercase;
+  letter-spacing: .1em;
+}
+.station-heading p span { opacity: .5; }
+.station-heading.v-heading h1 {
+  font-size: clamp(1.8rem, 7.2vw, 2.4rem);
+  font-weight: 720;
+  line-height: 1.04;
+  letter-spacing: -.045em;
+}
+.station-heading.v-heading .v-heading-icon {
+  width: clamp(42px, 12vw, 55px);
+  height: clamp(42px, 12vw, 55px);
+  border-radius: 16px;
+  color: var(--v-accent-dark);
+  background: linear-gradient(145deg, #fff, var(--v-soft));
+  border: 1px solid color-mix(in srgb, var(--v-accent) 27%, white);
+  box-shadow: inset 0 0 0 3px #fff9, 0 4px 15px #17323d10;
+}
+.v-mode-dinner .station-heading.v-heading p { color: #ead2ff; }
+
+.station-progress {
+  --dial-color: #67d9ff;
+  --dial-center: #0f425b;
+  isolation: isolate;
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0,1fr) auto;
+  align-items: center;
+  gap: 14px 8px;
+  overflow: hidden;
+  padding: clamp(16px, 4.6vw, 24px);
+  margin-bottom: 16px;
+  background: radial-gradient(ellipse at 93% 4%, #136284, transparent 68%), #0c2b40;
+  color: #fff;
+  border-radius: 23px;
+  box-shadow: 0 7px 20px #09283e22;
+}
+.v-mode-lunch .station-progress {
+  --dial-color: #ffc368;
+  --dial-center: #304744;
+  background: radial-gradient(ellipse at 99% 0%, #655631, transparent 67%), #103e43;
+}
+.v-mode-dinner .station-progress {
+  --dial-color: #ca99ff;
+  --dial-center: #3e285c;
+  background: radial-gradient(ellipse at 94% 2%, #65387d, transparent 68%), #28213e;
+}
+.station-progress::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background-image: radial-gradient(#fff5 .7px, transparent .9px);
+  background-size: 10px 10px;
+  mask-image: linear-gradient(100deg, transparent 23%, #0008);
+}
+.station-progress-copy h2 {
+  color: #fff;
+  font-size: .96rem; font-weight: 600; letter-spacing: .01em;
+}
+.station-progress-count {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: .14em;
+  margin: 5px 0 3px;
+  font: 560 clamp(2.2rem, 10vw, 3.5rem)/1 var(--font-display);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -.05em;
+}
+.station-progress-count small {
+  font-size: .41em;
+  letter-spacing: -.035em;
+  color: #dfebec;
+}
+.station-progress-copy p, .station-progress-remaining { font-size: .77rem; color: #e5eef0; }
+.station-progress-dial {
+  position: relative;
+  width: clamp(84px, 24vw, 114px);
+  aspect-ratio: 1;
+  display: grid; place-items: center;
+  background: radial-gradient(circle, var(--dial-center) 47%, transparent 48%);
+}
+.station-progress-dial svg {
+  width: 100%; height: 100%; position: absolute;
+  inset: 0; fill: none; transform: rotate(-90deg);
+}
+.station-dial-ticks { stroke: #ffffff72; stroke-width: 2; stroke-dasharray: .38 2.12; }
+.station-dial-track { stroke: #ffffff32; stroke-width: 6; }
+.station-dial-fill { stroke: var(--dial-color); stroke-width: 6; stroke-linecap: round; transition: stroke-dasharray .4s ease; }
+.station-progress-dial strong {
+  color: white; font-family: var(--font-display); font-weight: 650;
+  font-size: clamp(1.45rem, 6vw, 1.9rem); letter-spacing: -.06em;
+}
+.station-progress-dial small { font-size: .51em; margin-left: 1px; }
+.station-progress-remaining {
+  grid-column: 1 / -1; display: flex; align-items: center; gap: 7px;
+  border-top: 1px solid #ffffff30; padding-top: 11px;
+}
+.station-progress-remaining svg { color: var(--dial-color); }
+.station-progress-remaining strong { color: white; font-variant-numeric: tabular-nums; }

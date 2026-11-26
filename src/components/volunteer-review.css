@@ -1,0 +1,90 @@
+.v-review {
+  --review-inset: clamp(15px, 4vw, 23px);
+  padding: 0 var(--review-inset) 16px;
+  border: 1px solid #dae5e9;
+  background: white;
+  animation: v-review-enter 260ms ease-out both;
+}
+.v-review-identity {
+  margin-inline: calc(-1 * var(--review-inset));
+  padding: 18px var(--review-inset) 16px;
+  border-radius: 23px 23px 0 0;
+  background: linear-gradient(115deg, var(--v-soft), #fff 90%);
+  border-bottom: 1px solid #e3e9ec;
+}
+.v-review-id-line,
+.v-review-list-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.v-review .v-checkpoint-pill {
+  background: #fff;
+  color: var(--v-accent-dark);
+  box-shadow: 0 1px 3px #263d4814;
+  font-size: .72rem;
+}
+.v-review .v-team-code {
+  font: 700 .8rem/1.5 ui-monospace, monospace;
+  letter-spacing: .04em;
+  color: var(--v-accent-dark);
+  overflow-wrap: anywhere;
+}
+.v-review h2 {
+  margin: 16px 0 4px;
+  font-size: clamp(1.6rem, 6vw, 2.1rem);
+  line-height: 1.12;
+}
+.v-review .v-college {
+  margin: 0;
+  font-size: .875rem;
+  overflow-wrap: anywhere;
+}
+.v-review .v-team-meta {
+  margin: 14px 0 0;
+  padding: 0;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  border: 0;
+  color: #405665;
+}
+.v-review .v-team-meta > span {
+  flex: 0 1 auto;
+  font-size: .78rem;
+}
+.v-review-list-heading h3 { margin: 0; }
+.v-review-list-heading output {
+  padding: 4px 9px;
+  color: var(--v-accent-dark);
+  background: var(--v-soft);
+  font: 700 .75rem/1.5 var(--font-body);
+  border-radius: 999px;
+}
+.v-review .v-members > p {
+  margin: 5px 0 12px;
+  color: #465b68;
+  font-size: .875rem;
+}
+.v-review .v-member-row { transition: background-color .15s, border-color .15s; }
+.v-review .v-member-row:focus-within { outline: 2px solid var(--v-accent-dark); outline-offset: 2px; }
+.v-review .v-member-row[data-recorded] {
+  background: #f3f6f6;
+  color: #455860;
+  border-color: #dae2e3;
+}
+.v-review [data-recorded] small { color: #48645b; }
+.v-review .v-eligibility strong { font-size: .84rem; }
+.v-review .v-eligibility span { font-size: .78rem; }
+.v-review .v-text-button { min-height: 44px; color: #405662; font-size: .82rem; }
+.v-review .v-confirm-note { color: #52636c; font-size: .72rem; }
+.v-review .v-confirm-note svg { flex: none; }
+@keyframes v-review-enter {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .v-review { animation: none; }
+  .v-review .v-member-row { transition: none; }
+}

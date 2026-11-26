@@ -228,205 +228,60 @@
 .v-connection-off > span {
   background: #b87b16;
 }
-.v-progress-card {
+.station-pass {
+  --pass-edge: color-mix(in srgb, var(--v-accent) 24%, #d7e0df);
   position: relative;
-  overflow: hidden;
-  padding: 23px 24px 20px;
-  background: linear-gradient(125deg, #075171, #083a53 50%, #006779);
-  border-radius: 23px;
-  color: #fff;
-  border: 1px solid #70d8f0;
-  box-shadow: 0 9px 19px #0a659126;
-  margin-bottom: 20px;
-}
-.v-progress-card:after {
-  content: "";
-  position: absolute;
-  inset: -50px -70px -120px 40%;
-  pointer-events: none;
-  background: repeating-linear-gradient(
-    145deg,
-    transparent,
-    transparent 36px,
-    #6bd7e415 37px,
-    #6bd7e415 38px,
-    transparent 39px
-  );
-  transform: rotate(-7deg);
-}
-.v-progress-caption {
-  font-size: 14px;
-  font-weight: 700;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 14px;
-}
-.v-progress-caption > svg {
-  opacity: 0.75;
-}
-.v-progress-numbers {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 18px;
-  position: relative;
-  z-index: 1;
-}
-.v-progress-numbers strong {
-  font-family: var(--font-display);
-  font-size: 44px;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -0.035em;
-  line-height: 1.2;
-}
-.v-progress-numbers > div > span {
-  font-size: 24px;
-  font-weight: 700;
-  opacity: 0.9;
-  letter-spacing: -1px;
-}
-.v-progress-numbers small {
-  display: block;
-  font-size: 11px;
-  opacity: 0.8;
-  margin-top: 4px;
-}
-.v-percent {
-  border-left: 1px solid #abdeed6e;
-  padding-left: 24px;
-  text-align: center;
-}
-.v-percent strong {
-  font-size: 36px;
-}
-.v-percent strong span {
-  font-size: 27px;
-}
-.v-progress-track {
-  height: 13px;
-  border-radius: 20px;
-  border: 1px solid #a5e6ee;
-  overflow: hidden;
-  background: #c6eef521;
-  position: relative;
-  z-index: 1;
-}
-.v-progress-track > span {
-  display: block;
-  min-width: 0;
-  height: 100%;
-  border-radius: 20px;
-  background: linear-gradient(90deg, #08a7e0, var(--v-glow));
-  box-shadow: 0 0 9px var(--v-glow);
-  transition: width 0.4s;
-}
-.v-progress-foot {
-  display: flex;
-  justify-content: space-between;
-  gap: 6px;
-  margin-top: 13px;
-  font-size: 11px;
-  font-weight: 600;
-  position: relative;
-  z-index: 1;
-}
-.v-progress-foot span {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.v-mode-lunch .v-progress-card {
-  background: linear-gradient(125deg, #03474e, #004e50 60%, #526232);
-  border-color: #416e67;
-  box-shadow: 0 9px 22px #6f4c1b19;
-}
-.v-mode-lunch .v-progress-track > span {
-  background: linear-gradient(90deg, #ffc844, #f39200);
-}
-.v-mode-lunch .v-percent strong {
-  color: #ffd16c;
-}
-.v-mode-dinner .v-progress-card {
-  background: linear-gradient(135deg, #fff8ff, #f4e8fa);
-  border-color: #fff;
-  color: #521b6d;
-  box-shadow: 0 10px 30px #19002425;
-}
-.v-mode-dinner .v-progress-track {
-  background: #dfcce9;
-  border-color: transparent;
-}
-.v-mode-dinner .v-progress-track > span {
-  background: linear-gradient(90deg, #6e2cbb, #b42ad2);
-}
-.v-mode-dinner .v-percent {
-  border-color: #ddc2e7;
-}
-.v-scanner-card {
-  position: relative;
-  text-align: center;
-  isolation: isolate;
-  padding: 26px 20px 20px;
-  background: linear-gradient(130deg, #fff, #f7fcff);
-  border: 1px solid #fff;
-  border-radius: 25px;
-  box-shadow: 0 8px 20px #18425a12;
-  margin-bottom: 17px;
-  overflow: hidden;
-}
-.v-scanner-card:before {
-  content: "";
-  position: absolute;
-  z-index: -1;
-  width: 190px;
-  height: 190px;
-  border-radius: 50%;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  background: radial-gradient(circle, var(--v-soft), transparent 70%);
-}
-.v-scanner-corners {
-  position: absolute;
-  inset: 18px;
-  border: 1.5px solid color-mix(in srgb, var(--v-accent), white 45%);
-  border-radius: 19px;
-  z-index: -1;
-  mask-image: conic-gradient(
-    black 0deg 18deg,
-    transparent 18deg 72deg,
-    black 72deg 108deg,
-    transparent 108deg 252deg,
-    black 252deg 288deg,
-    transparent 288deg 342deg,
-    black 342deg
-  );
-}
-.v-qr-symbol {
-  width: 66px;
-  height: 66px;
-  background: linear-gradient(135deg, #35acd6, var(--v-accent-dark));
-  color: white;
-  border-radius: 18px;
-  margin: 0 auto 13px;
+  width: 100%;
   display: grid;
+  grid-template-columns: clamp(60px, 15vw, 82px) minmax(0,1fr) auto;
+  align-items: center;
+  gap: clamp(10px, 3vw, 17px);
+  min-height: 116px;
+  padding: 0 clamp(12px, 3.8vw, 20px) 0 0;
+  margin-bottom: 17px;
+  border: 1px solid var(--pass-edge);
+  border-radius: 18px;
+  background: linear-gradient(110deg, white 28%, color-mix(in srgb, var(--v-soft) 56%, white));
+  box-shadow: 0 5px 16px #12334712;
+  text-align: left;
+  color: var(--v-ink);
+  transition: box-shadow .18s, transform .18s;
+}
+.station-pass-stub {
+  position: relative;
+  display: grid;
+  align-self: stretch;
   place-items: center;
-  box-shadow: 0 5px 13px #178bb820;
+  border-radius: 17px 0 0 17px;
+  border-right: 1px dashed var(--pass-edge);
+  color: var(--v-accent-dark);
+  background: repeating-linear-gradient(-48deg, transparent 0 8px, #ffffff57 8px 10px), var(--v-soft);
 }
-.v-scanner-card h2 {
-  font-size: 29px;
-  font-weight: 600;
-  letter-spacing: -0.025em;
-  margin-bottom: 7px;
+.station-pass-stub svg {
+  padding: 5px;
+  box-sizing: content-box;
+  background: var(--v-soft);
+  outline: 1px solid var(--pass-edge);
+  border-radius: 8px;
+  transform: rotate(-6deg);
 }
-.v-scanner-card p {
-  font-size: 12px;
-  color: #5f7681;
-  margin-bottom: 23px;
+.station-pass-copy { display: grid; gap: 5px; padding-block: 15px; }
+.station-pass-copy strong {
+  font: 720 clamp(1.35rem, 5vw, 1.8rem)/1.1 var(--font-display);
+  letter-spacing: -.035em;
 }
+.station-pass-copy > span { font-size: .81rem; line-height: 1.5; color: #465862; }
+.station-pass-arrow {
+  display: grid; place-items: center;
+  width: 36px; height: 36px; border-radius: 50%;
+  color: white; background: var(--v-accent-dark);
+  transition: transform .18s;
+}
+@media (hover: hover) {
+  .station-pass:hover:enabled { box-shadow: 0 7px 20px #12334723; }
+  .station-pass:hover:enabled .station-pass-arrow { transform: translateX(2px); }
+}
+.station-pass:active:enabled { transform: translateY(1px); }
 .v-primary {
   font-family: var(--font-display);
   letter-spacing: 0.005em;
@@ -458,35 +313,14 @@
 .v-primary > svg:first-child {
   margin-right: auto;
 }
-.v-mode-lunch .v-scanner-card {
-  background: linear-gradient(130deg, #fffefa, #fff9ef);
-}
-.v-mode-lunch .v-qr-symbol {
-  background: linear-gradient(135deg, #fff2ca, #ffdf93);
-  color: #95500a;
-  border: 1px solid #ffe3a9;
-  box-shadow: 0 0 0 9px #fff0d188;
-}
 .v-mode-lunch .v-primary {
   background: linear-gradient(125deg, #e38500, #bd5c00 72%, #9f4700);
   border-color: #ffc760;
   border-radius: 30px;
   box-shadow: 0 6px 15px #b9771d2b;
 }
-.v-mode-dinner .v-scanner-card {
-  background: linear-gradient(135deg, #fff9ff, #efe2fb);
-  color: #3b1856;
-}
-.v-mode-dinner .v-qr-symbol {
-  background: linear-gradient(135deg, #e4bdf6, #f4e7fc);
-  color: #7922a5;
-  box-shadow: none;
-}
 .v-mode-dinner .v-primary {
   border-radius: 30px;
-}
-.v-mode-dinner .v-scanner-card p {
-  color: #6a5079;
 }
 .v-last-card,
 .v-lock-card {
@@ -569,49 +403,35 @@
   display: flex;
 }
 .v-bottom-nav {
-  display: flex;
-  justify-content: space-around;
-  gap: 9px;
-  padding: 14px 17px 17px;
-  background: linear-gradient(120deg, #004753, #063342);
-  color: #fff;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0,1fr));
+  gap: 4px;
+  padding: 9px clamp(8px, 3vw, 16px) 12px;
+  background: #fcfdfc;
+  border-top: 1px solid #d5e0e1;
+  color: #435865;
   position: sticky;
   bottom: 0;
   z-index: 4;
-  border-radius: 25px 25px 0 0;
-  box-shadow: 0 -5px 20px #12323d0d;
 }
 .v-bottom-nav button {
-  width: 33%;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 6px;
-  font-size: 10px;
-  font-weight: 600;
-  padding: 9px 4px;
+  justify-content: center;
+  gap: 5px;
+  min-height: 45px;
   border: 1px solid transparent;
-  border-radius: 15px;
+  border-radius: 12px;
   background: transparent;
-  color: #b5d0d4;
+  color: inherit;
+  font-size: clamp(.68rem, 2.6vw, .78rem);
+  font-weight: 650;
 }
+.v-bottom-nav svg { width: 19px; height: 19px; }
 .v-bottom-nav button.is-active {
-  color: white;
-  background: linear-gradient(135deg, #11778c, #07536a);
-  border-color: #2c9bae77;
-  box-shadow: 0 2px 8px #002c374d;
-}
-.v-mode-lunch .v-bottom-nav button.is-active {
-  color: #ffca58;
-  background: #73531d38;
-  border-color: #cb9a402e;
-}
-.v-mode-dinner .v-bottom-nav {
-  background: linear-gradient(125deg, #221334, #120e26);
-}
-.v-mode-dinner .v-bottom-nav button.is-active {
-  background: linear-gradient(125deg, #69318a, #3a245d);
-  border-color: #a358cf6b;
+  color: var(--v-accent-dark);
+  background: var(--v-soft);
+  border-color: color-mix(in srgb, var(--v-accent) 27%, white);
 }
 .v-section {
   background: #ffffffdb;
@@ -1321,15 +1141,6 @@
   .v-heading {
     gap: 11px;
   }
-  .v-progress-numbers strong {
-    font-size: 40px;
-  }
-  .v-percent {
-    padding-left: 20px;
-  }
-  .v-progress-card {
-    padding: 21px 20px 18px;
-  }
   .v-assigned-strip {
     padding-inline: 11px;
     gap: 6px;
@@ -1361,15 +1172,6 @@
   .v-heading > div > span {
     font-size: 10px;
   }
-  .v-progress-numbers strong {
-    font-size: 32px;
-  }
-  .v-progress-numbers > div > span {
-    font-size: 20px;
-  }
-  .v-percent strong {
-    font-size: 31px;
-  }
   .v-last-card {
     gap: 8px;
     padding-inline: 11px;
@@ -1380,9 +1182,6 @@
   .v-last-card time {
     font-size: 9px;
     padding-inline: 5px;
-  }
-  .v-progress-foot {
-    font-size: 10px;
   }
   .v-team-card {
     padding-left: 17px;

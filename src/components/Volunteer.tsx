@@ -1,3 +1,4 @@
+import { ScanCapture } from "./ScanCapture";
 import { BrandHeader } from "./shared";
 import { confirmedMembers, memberCount } from "../lib/attendance";
 import { randomId } from "../lib/id";
@@ -35,6 +36,9 @@ import {
 import type { Gateway, Preview, Receipt, Snapshot, Staff } from "../lib/types";
 import { AppError, categories, formatTime, labels } from "../lib/types";
 import "./volunteer.css";
+import "./volunteer-review.css";
+import "./station-progress.css";
+import "./scanner-camera.css";
 
 interface Props {
   gateway: Gateway;
@@ -123,7 +127,7 @@ export function Volunteer({
     cameraControls.current?.stop();
     cameraControls.current = null;
     const stream = video.current?.srcObject;
-    if (stream instanceof MediaStream)
+    if (typeof MediaStream !== "undefined" && stream instanceof MediaStream)
       stream.getTracks().forEach((track) => track.stop());
     setCameraActive(false);
   }, []);
@@ -215,7 +219,13 @@ export function Volunteer({
           throw new Error(
             "You are offline. Restore your connection before verifying a team.",
           );
-        const next = await gateway.preview(value.trim(), user.day, user.mode);
+        const [next] = await Promise.all([
+          gateway.preview(value.trim(), user.day, user.mode),
+          new Promise<void>((done) => {
+            const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+            window.setTimeout(done, reduceMotion ? 350 : 1250);
+          }),
+        ]);
         setPreview(next);
         setSelectedMembers([]);
         if (next.decision === "ALREADY_CONFIRMED" && next.previous) {
@@ -235,7 +245,9 @@ export function Volunteer({
   );
 
   const startCamera = useCallback(async () => {
+    if (decodeBusy.current) return;
     stopCamera();
+    setError("");
     setCameraError("");
     const generation = cameraGeneration.current;
     if (!video.current) return;
@@ -258,6 +270,7 @@ export function Volunteer({
       cameraControls.current = controls;
       setCameraActive(true);
     } catch (cause) {
+      if (generation !== cameraGeneration.current) return;
       setCameraActive(false);
       const name = cause instanceof Error ? cause.name : "";
       setCameraError(
@@ -400,7 +413,7 @@ export function Volunteer({
         {screen === "home" ? (
           <>
             <main className="v-main">
-              <header className="v-heading">
+              <header className="v-heading station-heading">
                 <div className="v-heading-icon">
                   <CheckpointIcon size={29} />
                 </div>
@@ -432,69 +445,69 @@ export function Volunteer({
               {tab === "home" && (
                 <>
                   <section
-                    className="v-progress-card"
+                    className="station-progress"
                     aria-label={`${completed} of ${eligible.length} eligible teams checked in`}
                   >
-                    <div className="v-progress-caption">
-                      {label} progress <CheckpointIcon size={24} />
-                    </div>
-                    <div className="v-progress-numbers">
-                      <div>
-                        <strong>{completed}</strong>
-                        <span> / {eligible.length}</span>
-                        <small>Teams checked in</small>
+                    <div className="station-progress-copy">
+                      <h2>{label} progress</h2>
+                      <div className="station-progress-count">
+                        {completed}<small> / {eligible.length}</small>
                       </div>
-                      <div className="v-percent">
-                        <strong>
-                          {percent}
-                          <span>%</span>
-                        </strong>
-                        <small>Completed</small>
-                      </div>
+                      <p>Teams checked in</p>
                     </div>
-                    <div className="v-progress-track">
-                      <span style={{ width: `${percent}%` }} />
-                    </div>
-                    <div className="v-progress-foot">
-                      <span>
-                        <CheckCircle2 size={17} />
-                        {completed} completed
-                      </span>
-                      <span>
-                        <Clock3 size={17} />
-                        {Math.max(0, eligible.length - completed)} remaining
-                      </span>
-                    </div>
-                  </section>
-                  <section className="v-scanner-card">
-                    <div className="v-scanner-corners" />
-                    <div className="v-qr-symbol">
-                      <QrCode size={40} />
-                    </div>
-                    <h2>Ready to Scan</h2>
-                    <p>
-                      Scan a team’s QR pass to confirm {label.toLowerCase()}
-                    </p>
-                    <button
-                      className="v-primary"
-                      onClick={openScanner}
-                      disabled={!online}
+                    <div
+                      className="station-progress-dial"
+                      role="progressbar"
+                      aria-label={`${label} completion`}
+                      aria-valuenow={percent}
+                      aria-valuemin={0}
+                      aria-valuemax={100}
                     >
-                      <Camera size={24} />
-                      Open Scanner
-                      <ArrowRight size={23} />
-                    </button>
+                      <svg viewBox="0 0 100 100" aria-hidden="true">
+                        <circle className="station-dial-ticks" cx="50" cy="50" r="47" pathLength="100" />
+                        <circle className="station-dial-track" cx="50" cy="50" r="39" />
+                        {percent > 0 && (
+                          <circle className="station-dial-fill" cx="50" cy="50" r="39" pathLength="100"
+                            strokeDasharray={`${percent} 100`} />
+                        )}
+                      </svg>
+                      <strong>{percent}<small>%</small></strong>
+                    </div>
+                    <div className="station-progress-remaining">
+                      <Clock3 size={15} aria-hidden="true" />
+                      <span><strong>{Math.max(0, eligible.length - completed)}</strong> remaining</span>
+                    </div>
                   </section>
+                  <button
+                    className="station-pass"
+                    onClick={openScanner}
+                    disabled={!online}
+                    aria-labelledby="station-pass-title"
+                    aria-describedby="station-pass-instructions"
+                  >
+                    <span className="station-pass-stub" aria-hidden="true">
+                      <QrCode size={38} strokeWidth={1.8} />
+                    </span>
+                    <span className="station-pass-copy">
+                      <strong id="station-pass-title">
+                        {online ? "Open Scanner" : "Scanner offline"}
+                      </strong>
+                      <span id="station-pass-instructions">
+                        {online ? "Scan a pass and select the members present." : "Reconnect to scan a team pass."}
+                      </span>
+                    </span>
+                    <span className="station-pass-arrow" aria-hidden="true"><ArrowRight size={20} /></span>
+                  </button>
                   <section className="v-last-card">
                     <span className="v-last-icon">
-                      <Check size={26} />
+                      {last ? <Check size={26} /> : <Clock3 size={22} />}
                     </span>
                     <div>
                       <span>Last successful check-in</span>
                       <strong>
                         {last
                           ? `${last.teamCode} · ${last.teamName}`
-                          : "Your next team is ready"}
+                          : "No check-ins yet"}
                       </strong>
                     </div>
                     {last && <time>{formatTime(last.at)}</time>}
@@ -686,27 +699,51 @@ export function Volunteer({
               </div>
               <CheckpointIcon size={22} />
             </div>
-            {screen === "scan" && (
+            {screen === "scan" && busy && <ScanCapture />}
+            {screen === "scan" && !busy && (
               <>
-                <div className="v-camera">
+                <div
+                  className="v-camera v-viewfinder"
+                  data-live={cameraActive && online}
+                >
                   <video
                     ref={video}
                     muted
                     playsInline
                     aria-label="Live QR scanner camera"
                   />
-                  <div className="v-camera-overlay">
-                    <div className="v-camera-frame">
-                      <span />
-                    </div>
-                    <p>
-                      {busy
-                        ? "Verifying team…"
+                  <div className="v-viewfinder-status" role="status">
+                    <span>
+                      <i aria-hidden="true" />
+                      {!online
+                        ? "Offline"
                         : cameraActive
-                          ? "Align the team QR within the frame"
-                          : "Preparing your camera"}
-                    </p>
+                          ? "Camera live"
+                          : cameraError
+                            ? "Camera unavailable"
+                            : error ? "Camera paused" : "Camera standby"}
+                    </span>
                   </div>
+                  <div className="v-lens" aria-hidden="true">
+                    <i />
+                    <i />
+                    <i />
+                    <i />
+                    <div className="v-lens-interior">
+                      {cameraActive ? (
+                        <span className="v-lens-sweep" />
+                      ) : (
+                        <Camera size={30} strokeWidth={1.4} />
+                      )}
+                    </div>
+                  </div>
+                  <p className="v-lens-caption">
+                    {!online
+                      ? "Reconnect to scan a team pass"
+                      : cameraError
+                        ? "Choose a QR image or retry the camera"
+                        : "Fit the team QR inside the corners"}
+                  </p>
                 </div>
                 {cameraError && (
                   <div className="v-notice">
@@ -714,7 +751,7 @@ export function Volunteer({
                     <p>{cameraError}</p>
                   </div>
                 )}
-                <div className="v-camera-actions">
+                <div className="v-camera-actions v-scanner-controls">
                   <button
                     className="v-secondary"
                     onClick={() => void startCamera()}
@@ -729,7 +766,7 @@ export function Volunteer({
                     disabled={busy || !online}
                   >
                     <ImagePlus size={18} />
-                    QR image
+                    Choose QR image
                   </button>
                   <input
                     type="file"
@@ -741,10 +778,10 @@ export function Volunteer({
                     }
                   />
                 </div>
-                <p className="v-scan-explainer">
+                <p className="v-scan-explainer v-scanner-hint">
                   <ShieldCheck size={16} />
-                  Scanning only opens the team details. You confirm the
-                  check-in.
+                  Review the team and select the members present before
+                  confirming.
                 </p>
                 {gateway.kind === "demo" && (
                   <div className="v-demo-tools">
@@ -788,38 +825,50 @@ export function Volunteer({
               </>
             )}
             {screen === "verify" && preview && (
-              <section className="v-team-card">
-                <span className="v-checkpoint-pill">
-                  <CheckpointIcon size={16} />
-                  {label} Check-in · Day {user.day}
-                </span>
-                <div className="v-team-avatar">
-                  <UsersRound size={36} />
-                </div>
-                <span className="v-team-code">{preview.team.code}</span>
-                <h2>{preview.team.name}</h2>
-                <p className="v-college">
-                  <Landmark size={19} />
-                  {preview.team.college}
-                </p>
-                <div className="v-team-meta">
-                  <span>
-                    <Tag size={16} />
-                    Category {preview.team.category}
-                  </span>
-                  <span>
-                    <UsersRound size={16} />
-                    {preview.team.members.length} members
-                  </span>
-                </div>
+              <section className="v-team-card v-review">
+                <header className="v-review-identity">
+                  <div className="v-review-id-line">
+                    <span className="v-checkpoint-pill">
+                      <CheckpointIcon size={16} />
+                      {label} Check-in · Day {user.day}
+                    </span>
+                    <span className="v-team-code">{preview.team.code}</span>
+                  </div>
+                  <h2>{preview.team.name}</h2>
+                  <p className="v-college">
+                    <Landmark size={19} />
+                    {preview.team.college}
+                  </p>
+                  <div className="v-team-meta">
+                    <span>
+                      <Tag size={16} />
+                      Category {preview.team.category} ·{" "}
+                      {categories[preview.team.category]}
+                    </span>
+                    <span>
+                      <UsersRound size={16} />
+                      {preview.team.members.length}{" "}
+                      {preview.team.members.length === 1 ? "member" : "members"}
+                    </span>
+                  </div>
+                </header>
                 <div className="v-members">
-                  <h3>Verify team members</h3>
+                  <div className="v-review-list-heading">
+                    <h3>Verify team members</h3>
+                    <output aria-live="polite">
+                      {selectedMembers.length} selected
+                    </output>
+                  </div>
                   <p>Select the members present now.</p>
                   {preview.team.members.map((member, index) => {
                     const checkedIn =
                       preview.checkedMemberIndices?.includes(index) ?? false;
                     return (
-                      <label className="v-member-row" key={index}>
+                      <label
+                        className="v-member-row"
+                        key={index}
+                        data-recorded={checkedIn || undefined}
+                      >
                         <input
                           type="checkbox"
                           disabled={checkedIn || busy}
@@ -844,9 +893,8 @@ export function Volunteer({
                 <div className="v-eligibility">
                   <ShieldCheck size={21} />
                   <div>
-                    <strong>{label} is available</strong>
+                    <strong>{label} confirmation</strong>
                     <span>
-                      {categories[preview.team.category]} ·{" "}
                       {seconds > 0
                         ? `Confirmation expires in ${seconds}s`
                         : "Preview expired. Scan the pass again."}
