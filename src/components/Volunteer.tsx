@@ -1,3 +1,4 @@
+import { ReceiptSuccess } from "./ReceiptSuccess";
 import { ScanCapture } from "./ScanCapture";
 import { BrandHeader } from "./shared";
 import { confirmedMembers, memberCount } from "../lib/attendance";
@@ -164,7 +165,7 @@ export function Volunteer({
   useEffect(() => {
     if (screen === "home") return;
     const area = focusArea.current;
-    area?.focus();
+    area?.focus({ preventScroll: screen === "result" && !!area?.querySelector(".receipt-hero") });
     const keydown = (event: KeyboardEvent) => {
       if (event.key !== "Tab" || !area) return;
       const controls = Array.from(
@@ -938,24 +939,15 @@ export function Volunteer({
                 className={`v-result v-result-${receipt.code.toLowerCase()}`}
               >
                 {receipt.code === "CONFIRMED" ? (
-                  <div className="receipt-seal" aria-hidden="true">
-                    <svg viewBox="0 0 96 96" fill="none">
-                      <circle className="receipt-seal-ring" cx="48" cy="48" r="43" pathLength="100" />
-                      <path className="receipt-seal-check" d="m29 49 13 13 26-28" pathLength="100" />
-                    </svg>
-                  </div>
+                  <ReceiptSuccess />
                 ) : (
-                  <div className="v-result-icon" aria-hidden="true">
-                    {receipt.code === "VOIDED" ? <Info size={44} /> : <X size={44} />}
-                  </div>
+                  <>
+                    <div className="v-result-icon" aria-hidden="true">
+                      {receipt.code === "VOIDED" ? <Info size={44} /> : <X size={44} />}
+                    </div>
+                    <h2>{receipt.code === "VOIDED" ? "Check-in Corrected" : "Already Checked In"}</h2>
+                  </>
                 )}
-                <h2>
-                  {receipt.code === "CONFIRMED"
-                    ? "Check-in Successful!"
-                    : receipt.code === "VOIDED"
-                      ? "Check-in Corrected"
-                      : "Already Checked In"}
-                </h2>
                 <p>
                   {receipt.code === "CONFIRMED"
                     ? (receipt.claim.quantity ?? 0) +
